@@ -1,0 +1,9 @@
+exports[`test extract 1`] = `
+"const a = 5
+5 + 2"
+`;
+
+exports[`test extract 2`] = `
+"const a = 2
+5 + 2"
+`;
