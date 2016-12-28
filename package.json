@@ -5,5 +5,11 @@
   "main": "index.js",
   "repository": "https://github.com/michalwarda/flow-factor.git",
   "author": "Michał Warda",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "flow": "flow"
+  },
+  "devDependencies": {
+    "flow-bin": "^0.37.4"
+  }
 }
