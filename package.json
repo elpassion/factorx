@@ -7,9 +7,27 @@
   "author": "Michał Warda",
   "license": "MIT",
   "scripts": {
-    "flow": "flow"
+    "flow": "flow",
+    "build": "babel src -d lib",
+    "test": "jest",
+    "watch": "jest --watch",
+    "flow-typed": "flow-typed install"
   },
+  "pre-commit": [
+    "flow",
+    "test"
+  ],
   "devDependencies": {
-    "flow-bin": "^0.37.4"
+    "babel-cli": "^6.18.0",
+    "babel-jest": "^18.0.0",
+    "babel-plugin-syntax-flow": "^6.18.0",
+    "babel-plugin-transform-flow-strip-types": "^6.21.0",
+    "babel-polyfill": "^6.20.0",
+    "babel-preset-env": "^1.1.4",
+    "babel-preset-stage-0": "^6.16.0",
+    "flow-bin": "^0.37.4",
+    "flow-typed": "^2.0.0",
+    "jest": "^18.0.0",
+    "pre-commit": "^1.2.2"
   }
 }
