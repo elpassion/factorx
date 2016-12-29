@@ -1,19 +1,29 @@
 exports[`test extractVariable 1`] = `
-"const a = 5
-a + 2"
+"let number = 5
+number + 2"
 `;
 
 exports[`test extractVariable 2`] = `
-"const a = 2
-5 + a"
+"let number = 2
+5 + number"
 `;
 
 exports[`test extractVariable 3`] = `
-"const a = \'abc\'
-a + \'cde\'"
+"let string = \'abc\'
+string + \'cde\'"
 `;
 
 exports[`test extractVariable 4`] = `
-"const a = \'cde\'
-\'abc\' + a"
+"const text = \'cde\'
+\'abc\' + text"
+`;
+
+exports[`test extractVariable 5`] = `
+"var varText = \'cde\'
+\'abc\' + varText"
+`;
+
+exports[`test extractVariable 6`] = `
+"let addition = \'abc\' + \'cde\'
+addition"
 `;

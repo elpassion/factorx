@@ -21,9 +21,11 @@ const name = 5
 
 test('extractVariable', () => {
   const code = `5 + 2`
-  expect(extractVariable(code, 1, 1).getSourceCode()).toMatchSnapshot()
-  expect(extractVariable(code, 1, 5).getSourceCode()).toMatchSnapshot()
+  expect(extractVariable(code, 1, 1, 'let', 'number').getSourceCode()).toMatchSnapshot()
+  expect(extractVariable(code, 1, 5, 'let', 'number').getSourceCode()).toMatchSnapshot()
   const code2 = `'abc' + 'cde'`
-  expect(extractVariable(code2, 1, 1).getSourceCode()).toMatchSnapshot()
-  expect(extractVariable(code2, 1, 10).getSourceCode()).toMatchSnapshot()
+  expect(extractVariable(code2, 1, 1, 'let', 'string').getSourceCode()).toMatchSnapshot()
+  expect(extractVariable(code2, 1, 10, 'const', 'text').getSourceCode()).toMatchSnapshot()
+  expect(extractVariable(code2, 1, 10, 'var', 'varText').getSourceCode()).toMatchSnapshot()
+  expect(extractVariable(code2, 1, 6, 'let', 'addition').getSourceCode()).toMatchSnapshot()
 })

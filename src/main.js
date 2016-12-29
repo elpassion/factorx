@@ -25,17 +25,23 @@ export function tokenAt (ast: Object, line: number, column: number) {
   return token
 }
 
-export function extractVariable (code: string, line: number, column: number) {
+export function extractVariable (
+  code: string,
+  line: number,
+  column: number,
+  variableKind: 'let' | 'const' | 'var',
+  variableName: string
+) {
   const ast = parse(code)
   const token = tokenAt(ast, line, column)
   const expression = token.parentElement
   let VD = new VariableDeclaration([
-    new Token('Keyword', 'const'),
+    new Token('Keyword', variableKind),
     new Token('Whitespace', ' '),
 
     new VariableDeclarator([
       new Identifier([
-        new Token('Identifier', 'a')
+        new Token('Identifier', variableName)
       ]),
 
       new Token('Whitespace', ' '),
@@ -45,7 +51,7 @@ export function extractVariable (code: string, line: number, column: number) {
     ]),
     new Token('Whitespace', '\n')
   ])
-  expression.parentElement.replaceChild(new Identifier([ new Token('Identifier', 'a') ]), expression)
+  expression.parentElement.replaceChild(new Identifier([ new Token('Identifier', variableName) ]), expression)
   ast.prependChild(VD)
   return ast
 }
