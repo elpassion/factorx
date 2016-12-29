@@ -3,12 +3,11 @@ const cst = require('cst')
 const {
   VariableDeclarator,
   VariableDeclaration,
-  Identifier,
-  NumericLiteral
+  Identifier
 } = cst.types
 const {Token} = cst
 
-export function tokenAt (code: string, line: number, column: number) {
+export function tokenAt (ast: Object, line: number, column: number) {
   function isInTokenColumnRange (token) {
     const {start, end} = token.getLoc()
     return start.column <= column && end.column >= column
@@ -18,7 +17,6 @@ export function tokenAt (code: string, line: number, column: number) {
     return token.getLoc().start.line === line
   }
 
-  const ast = parse(code)
   let token = ast.getFirstToken()
 
   while (!isInTokenLineRange(token) || !isInTokenColumnRange(token)) {
@@ -27,9 +25,10 @@ export function tokenAt (code: string, line: number, column: number) {
   return token
 }
 
-export function extract (code: string, line: number, column: number) {
-  const token = tokenAt(code, line, column)
-
+export function extractVariable (code: string, line: number, column: number) {
+  const ast = parse(code)
+  const token = tokenAt(ast, line, column)
+  const expression = token.parentElement
   let VD = new VariableDeclaration([
     new Token('Keyword', 'const'),
     new Token('Whitespace', ' '),
@@ -42,19 +41,15 @@ export function extract (code: string, line: number, column: number) {
       new Token('Whitespace', ' '),
       new Token('Punctuator', '='),
       new Token('Whitespace', ' '),
-
-      // Yeah, a bit convoluted but that's is what we have in original babylon AST
-      new NumericLiteral([
-        new Token('Numeric', token.value)
-      ])
+      expression.cloneElement()
     ]),
     new Token('Whitespace', '\n')
   ])
-  const ast = parse(code)
+  expression.parentElement.replaceChild(new Identifier([ new Token('Identifier', 'a') ]), expression)
   ast.prependChild(VD)
   return ast
 }
 
-function parse (code) {
+export function parse (code: string): Object {
   return new cst.Parser().parse(code)
 }
