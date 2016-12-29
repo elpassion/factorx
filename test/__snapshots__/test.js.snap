@@ -27,3 +27,13 @@ exports[`test extractVariable 6`] = `
 "let addition = \'abc\' + \'cde\'
 addition"
 `;
+
+exports[`test extractVariable 7`] = `
+"let addition = \'abc\' + \'cde\'
+addition"
+`;
+
+exports[`test extractVariable 8`] = `
+"let addition = \'abc\' + \'cde\'
+addition"
+`;

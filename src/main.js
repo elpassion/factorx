@@ -7,6 +7,17 @@ const {
 } = cst.types
 const {Token} = cst
 
+type location = {
+  start: {
+    line: number,
+    column: number
+  },
+  end: {
+    line: number,
+    column: number
+  }
+}
+
 export function tokenAt (ast: Object, line: number, column: number) {
   function isInTokenColumnRange (token) {
     const {start, end} = token.getLoc()
@@ -27,14 +38,12 @@ export function tokenAt (ast: Object, line: number, column: number) {
 
 export function extractVariable (
   code: string,
-  line: number,
-  column: number,
+  location: location,
   variableKind: 'let' | 'const' | 'var',
   variableName: string
 ) {
   const ast = parse(code)
-  const token = tokenAt(ast, line, column)
-  const expression = token.parentElement
+  const expression = expressionAt(ast, location)
 
   function createIdentifier () {
     return new Identifier([new Token('Identifier', variableName)])
@@ -57,6 +66,32 @@ export function extractVariable (
   expression.parentElement.replaceChild(createIdentifier(), expression)
   ast.prependChild(VD)
   return ast
+}
+
+export function expressionAt (ast: Object, {start, end}: location) {
+  const token = tokenAt(ast, start.line, start.column)
+
+  if (JSON.stringify(start) === JSON.stringify(end)) {
+    if (token.parentElement.isExpression) {
+      return token.parentElement
+    } else {
+      throw new Error('Selection does not form an expression')
+    }
+  } else {
+    let element = token.parentElement
+
+    while (!(
+      element.getLoc().end.line === end.line &&
+      element.getLoc().end.column === end.column &&
+      element.isExpression)) {
+      if (element.parentElement) {
+        element = element.parentElement
+      } else {
+        throw new Error('Selection does not form an expression')
+      }
+    }
+    return element
+  }
 }
 
 export function parse (code: string): Object {
