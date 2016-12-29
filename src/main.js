@@ -35,15 +35,17 @@ export function extractVariable (
   const ast = parse(code)
   const token = tokenAt(ast, line, column)
   const expression = token.parentElement
+
+  function createIdentifier () {
+    return new Identifier([new Token('Identifier', variableName)])
+  }
+
   let VD = new VariableDeclaration([
     new Token('Keyword', variableKind),
     new Token('Whitespace', ' '),
 
     new VariableDeclarator([
-      new Identifier([
-        new Token('Identifier', variableName)
-      ]),
-
+      createIdentifier(),
       new Token('Whitespace', ' '),
       new Token('Punctuator', '='),
       new Token('Whitespace', ' '),
@@ -51,7 +53,8 @@ export function extractVariable (
     ]),
     new Token('Whitespace', '\n')
   ])
-  expression.parentElement.replaceChild(new Identifier([ new Token('Identifier', variableName) ]), expression)
+
+  expression.parentElement.replaceChild(createIdentifier(), expression)
   ast.prependChild(VD)
   return ast
 }
