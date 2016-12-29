@@ -25,20 +25,20 @@ test('expressionAt', () => {
 
 test('extractVariable', () => {
   let location
-  location = {start: {column: 1, line: 1}, end: {column: 1, line: 1}}
+  location = {start: {line: 1, column: 1}, end: {line: 1, column: 1}}
   expect(extractVariable(exampleCode.binaryExpression, location, 'let', 'number').getSourceCode()).toMatchSnapshot()
-  location = {start: {column: 5, line: 1}, end: {column: 5, line: 1}}
+  location = {start: {line: 1, column: 5}, end: {line: 1, column: 5}}
   expect(extractVariable(exampleCode.binaryExpression, location, 'let', 'number').getSourceCode()).toMatchSnapshot()
-  location = {start: {column: 5, line: 1}, end: {column: 5, line: 1}}
+  location = {start: {line: 1, column: 5}, end: {line: 1, column: 5}}
   expect(extractVariable(exampleCode.binaryExpressionString, location, 'let', 'string').getSourceCode()).toMatchSnapshot()
-  location = {start: {column: 10, line: 1}, end: {column: 10, line: 1}}
+  location = {start: {line: 1, column: 10}, end: {line: 1, column: 10}}
   expect(extractVariable(exampleCode.binaryExpressionString, location, 'const', 'text').getSourceCode()).toMatchSnapshot()
-  location = {start: {column: 10, line: 1}, end: {column: 10, line: 1}}
+  location = {start: {line: 1, column: 10}, end: {line: 1, column: 10}}
   expect(extractVariable(exampleCode.binaryExpressionString, location, 'var', 'varText').getSourceCode()).toMatchSnapshot()
-  location = {start: {column: 6, line: 1}, end: {column: 6, line: 1}}
+  location = {start: {line: 1, column: 6}, end: {line: 1, column: 6}}
   expect(extractVariable(exampleCode.binaryExpressionString, location, 'let', 'addition').getSourceCode()).toMatchSnapshot()
-  location = {start: {column: 1, line: 1}, end: {column: 13, line: 1}}
+  location = {start: {line: 1, column: 1}, end: {line: 1, column: 13}}
   expect(extractVariable(exampleCode.binaryExpressionString, location, 'let', 'addition').getSourceCode()).toMatchSnapshot()
-  location = {start: {column: 0, line: 1}, end: {column: 13, line: 1}}
+  location = {start: {line: 1, column: 0}, end: {line: 1, column: 13}}
   expect(extractVariable(exampleCode.binaryExpressionString, location, 'let', 'addition').getSourceCode()).toMatchSnapshot()
 })

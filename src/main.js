@@ -68,29 +68,43 @@ export function extractVariable (
   return ast
 }
 
-export function expressionAt (ast: Object, {start, end}: location) {
+function notAnExpressionError () {
+  return new Error('Selection does not form an expression')
+}
+
+function findExpressionAtPoint (ast, start) {
   const token = tokenAt(ast, start.line, start.column)
 
-  if (JSON.stringify(start) === JSON.stringify(end)) {
-    if (token.parentElement.isExpression) {
-      return token.parentElement
-    } else {
-      throw new Error('Selection does not form an expression')
-    }
+  if (token.parentElement.isExpression) {
+    return token.parentElement
   } else {
-    let element = token.parentElement
+    throw notAnExpressionError()
+  }
+}
 
-    while (!(
-      element.getLoc().end.line === end.line &&
-      element.getLoc().end.column === end.column &&
-      element.isExpression)) {
-      if (element.parentElement) {
-        element = element.parentElement
-      } else {
-        throw new Error('Selection does not form an expression')
-      }
+function findExpressionInRange (ast, start, end) {
+  const token = tokenAt(ast, start.line, start.column)
+  let element = token.parentElement
+
+  function isMatchingExpression () {
+    return !(JSON.stringify(element.getLoc().end) === JSON.stringify(end) && element.isExpression)
+  }
+
+  while (isMatchingExpression()) {
+    if (element.parentElement) {
+      element = element.parentElement
+    } else {
+      throw notAnExpressionError()
     }
-    return element
+  }
+  return element
+}
+
+export function expressionAt (ast: Object, {start, end}: location) {
+  if (JSON.stringify(start) === JSON.stringify(end)) {
+    return findExpressionAtPoint(ast, start)
+  } else {
+    return findExpressionInRange(ast, start, end)
   }
 }
 
