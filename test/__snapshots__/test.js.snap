@@ -4,36 +4,11 @@ number + 2"
 `;
 
 exports[`test extractVariable 2`] = `
-"let number = 2
-5 + number"
+"let number = 5 + 2
+number"
 `;
 
 exports[`test extractVariable 3`] = `
-"let string = \'abc\'
-string + \'cde\'"
-`;
-
-exports[`test extractVariable 4`] = `
-"const text = \'cde\'
-\'abc\' + text"
-`;
-
-exports[`test extractVariable 5`] = `
-"var varText = \'cde\'
-\'abc\' + varText"
-`;
-
-exports[`test extractVariable 6`] = `
-"let addition = \'abc\' + \'cde\'
-addition"
-`;
-
-exports[`test extractVariable 7`] = `
-"let addition = \'abc\' + \'cde\'
-addition"
-`;
-
-exports[`test extractVariable 8`] = `
-"let addition = \'abc\' + \'cde\'
-addition"
+"let number = 2
+5 + number"
 `;
