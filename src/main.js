@@ -1,11 +1,8 @@
 // @flow
+const flatten = require('lodash/flatten')
 const cst = require('cst')
-const {
-  VariableDeclarator,
-  VariableDeclaration,
-  Identifier
-} = cst.types
-const {Token} = cst
+const {VariableDeclarator, VariableDeclaration, Identifier} = cst.types
+const {Token, Parser} = cst
 
 type location = {
   start: {
@@ -74,12 +71,6 @@ export function expressionAt (ast: Object, {start: cursorStart, end: cursorEnd}:
 }
 
 export function expressionsAt (ast: Object, {start, end}: location) {
-  function flatten (arr) {
-    return arr.reduce((a, b) => {
-      return a.concat(Array.isArray(b) ? flatten(b) : b)
-    }, [])
-  }
-
   function matchingExpressions (node, {start, end}, nodesInRange = []) {
     node.childElements.forEach((child) => {
       const {start: childStart, end: childEnd} = child.getLoc()
@@ -106,5 +97,5 @@ export function expressionsAt (ast: Object, {start, end}: location) {
 }
 
 export function parse (code: string): Object {
-  return new cst.Parser().parse(code)
+  return new Parser().parse(code)
 }
