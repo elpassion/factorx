@@ -4,16 +4,8 @@ const cst = require('cst')
 const {VariableDeclarator, VariableDeclaration, Identifier} = cst.types
 const {Token, Parser} = cst
 
-type location = {
-  start: {
-    line: number,
-    column: number
-  },
-  end: {
-    line: number,
-    column: number
-  }
-}
+type cursorPosition = { line: number, column: number }
+type location = { cursorStart: cursorPosition, cursorEnd: cursorPosition }
 
 export function extractVariable (
   code: string,
@@ -51,8 +43,8 @@ function notAnExpressionError () {
   return new Error('Selection does not form an expression')
 }
 
-export function expressionAt (ast: Object, {start: cursorStart, end: cursorEnd}: location) {
-  const matchingExpression = expressionsAt(ast, {start: cursorStart, end: cursorEnd}).filter((expression) => {
+export function expressionAt (ast: Object, {cursorStart, cursorEnd}: location) {
+  const matchingExpression = expressionsAt(ast, {cursorStart, cursorEnd}).filter((expression) => {
     const {start: expressionStart, end: expressionEnd} = expression.getLoc()
     const isExpressionMatching = (
       expressionStart.column === cursorStart.column &&
@@ -70,30 +62,30 @@ export function expressionAt (ast: Object, {start: cursorStart, end: cursorEnd}:
   }
 }
 
-export function expressionsAt (ast: Object, {start, end}: location) {
-  function matchingExpressions (node, {start, end}, nodesInRange = []) {
+export function expressionsAt (ast: Object, {cursorStart, cursorEnd}: location) {
+  const normalizedLocation = {
+    cursorStart: {line: cursorStart.line + 1, column: cursorStart.column},
+    cursorEnd: {line: cursorEnd.line + 1, column: cursorEnd.column}
+  }
+
+  function matchingExpressions (node, nodesInRange = []) {
     node.childElements.forEach((child) => {
       const {start: childStart, end: childEnd} = child.getLoc()
       const isChildInRange = (
-        childStart.column <= start.column &&
-        childStart.line <= start.line &&
-        childEnd.column >= end.column &&
-        childEnd.line >= end.line
+        childStart.column <= normalizedLocation.cursorStart.column &&
+        childStart.line <= normalizedLocation.cursorStart.line &&
+        childEnd.column >= normalizedLocation.cursorEnd.column &&
+        childEnd.line >= normalizedLocation.cursorEnd.line
       )
       if (isChildInRange) {
         if (child.isExpression) nodesInRange.push(child)
-        matchingExpressions(child, {start, end}, nodesInRange)
+        matchingExpressions(child, nodesInRange)
       }
     })
     return flatten(nodesInRange)
   }
 
-  const normalizedLocation = {
-    start: {line: start.line + 1, column: start.column},
-    end: {line: end.line + 1, column: end.column}
-  }
-
-  return matchingExpressions(ast, normalizedLocation)
+  return matchingExpressions(ast)
 }
 
 export function parse (code: string): Object {
