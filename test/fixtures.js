@@ -5,3 +5,6 @@ export const multiLineExpression = `
 5 + 2
 const name = 5
 `
+export const ifStatement = `if(5 == 5) {
+  'abc'
+}`

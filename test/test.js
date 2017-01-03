@@ -63,4 +63,8 @@ test('extractVariable', () => {
   expect(extractVariable(exampleCode.binaryExpression, location, 'let', 'number').getSourceCode()).toMatchSnapshot()
   location = {cursorStart: {line: 0, column: 4}, cursorEnd: {line: 0, column: 5}}
   expect(extractVariable(exampleCode.binaryExpression, location, 'let', 'number').getSourceCode()).toMatchSnapshot()
+  location = {cursorStart: {line: 0, column: 3}, cursorEnd: {line: 0, column: 4}}
+  expect(extractVariable(exampleCode.ifStatement, location, 'let', 'number').getSourceCode()).toMatchSnapshot()
+  location = {cursorStart: {line: 1, column: 2}, cursorEnd: {line: 1, column: 7}}
+  expect(extractVariable(exampleCode.ifStatement, location, 'let', 'number').getSourceCode()).toMatchSnapshot()
 })

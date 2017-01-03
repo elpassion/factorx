@@ -34,8 +34,14 @@ export function extractVariable (
     new Token('Whitespace', '\n')
   ])
 
+  let node = expression.parentElement
+  let child = expression
+  while (node.type !== 'Program' && node.type !== 'BlockStatement') {
+    child = node
+    node = node.parentElement
+  }
+  node.insertChildBefore(VD, child)
   expression.parentElement.replaceChild(createIdentifier(), expression)
-  ast.prependChild(VD)
   return ast
 }
 
@@ -71,14 +77,24 @@ export function expressionsAt (ast: Object, {cursorStart, cursorEnd}: location) 
   function matchingExpressions (node, nodesInRange = []) {
     node.childElements.forEach((child) => {
       const {start: childStart, end: childEnd} = child.getLoc()
-      const isChildInRange = (
-        childStart.column <= normalizedLocation.cursorStart.column &&
-        childStart.line <= normalizedLocation.cursorStart.line &&
-        childEnd.column >= normalizedLocation.cursorEnd.column &&
-        childEnd.line >= normalizedLocation.cursorEnd.line
-      )
+      let isChildInRange
+      if (childStart.line === childEnd.line) {
+        isChildInRange = (
+          childStart.column <= normalizedLocation.cursorStart.column &&
+          childStart.line === normalizedLocation.cursorStart.line &&
+          childEnd.column >= normalizedLocation.cursorEnd.column &&
+          childEnd.line === normalizedLocation.cursorEnd.line
+        )
+      } else {
+        isChildInRange = (
+          childStart.line <= normalizedLocation.cursorStart.line &&
+          childEnd.line >= normalizedLocation.cursorEnd.line
+        )
+      }
       if (isChildInRange) {
-        if (child.isExpression) nodesInRange.push(child)
+        if (child.isExpression) {
+          nodesInRange.push(child)
+        }
         matchingExpressions(child, nodesInRange)
       }
     })

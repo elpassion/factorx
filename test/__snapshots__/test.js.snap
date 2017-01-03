@@ -12,3 +12,17 @@ exports[`test extractVariable 3`] = `
 "let number = 2
 5 + number"
 `;
+
+exports[`test extractVariable 4`] = `
+"let number = 5
+if(number == 5) {
+  \'abc\'
+}"
+`;
+
+exports[`test extractVariable 5`] = `
+"if(5 == 5) {
+  let number = \'abc\'
+number
+}"
+`;
