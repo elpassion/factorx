@@ -12,7 +12,8 @@
     "test": "jest",
     "watch": "jest --watch",
     "flow-typed": "flow-typed install",
-    "lint": "eslint 'src/**'"
+    "lint": "eslint 'src/**'",
+    "prepublish": "babel src -d lib"
   },
   "bin": {
     "flow-factor": "bin/flow-factor.js"
