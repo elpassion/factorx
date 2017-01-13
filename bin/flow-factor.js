@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 // @flow
 const program = require('commander')
-const {expressionsAt, parse} = require('../lib/main')
+const {expressionsAt, parse, extractVariable} = require('../lib/main')
 const getStdin = require('get-stdin')
 
 program
@@ -15,6 +15,18 @@ program
     }
 
     getExpressions(selection)
+  })
+
+program
+  .command('getExtract <startLine> <startColumn> <endLine> <endColumn>')
+  .description('extract selected variable')
+  .action((startLine, startColumn, endLine, endColumn) => {
+    const selection = {
+      start: { line: parseInt(startLine), column: parseInt(startColumn) },
+      end: { line: parseInt(endLine), column: parseInt(endColumn) }
+    }
+
+    getExtract(selection)
   })
 
 program.parse(process.argv)
@@ -47,6 +59,16 @@ function getExpressions (selection) {
     const expressions = expressionsAt(ast, selection)
     const serializedExpressions = serializeExpressions(expressions, file)
     writeJSON({expressions: serializedExpressions})
+  })
+  .catch(err => console.log(err))
+}
+
+function getExtract (selection) {
+  getStdin()
+  .then(file => {
+    const ast = parse(file)
+
+    writeJSON(extractVariable(ast, selection, file))
   })
   .catch(err => console.log(err))
 }

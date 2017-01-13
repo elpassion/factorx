@@ -90,6 +90,11 @@ function pathAt (ast: Object, selection: selection) {
 
 export function extractVariable (ast: Object, selection: selection, code: string) {
   const path = pathAt(ast, selection)
+
+  function denormalizePosition (position) {
+    return { line: position.line - 1, column: position.column }
+  }
+
   if (path) {
     const extractedCode = code.slice(path.node.start, path.node.end)
     let closestStatement = path.parentPath
@@ -101,8 +106,8 @@ export function extractVariable (ast: Object, selection: selection, code: string
     const insertedCode = `\nvar ${identifier} = ${extractedCode}\n`
 
     const operations = [
-      {type: 'replace', selection, code: identifier},
-      {type: 'add', statementPositon, code: insertedCode}
+      {type: 'replace', at: selection, code: identifier},
+      {type: 'add', at: denormalizePosition(statementPositon), code: insertedCode}
     ]
     return operations
   }
