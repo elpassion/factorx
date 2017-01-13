@@ -1,29 +1,56 @@
 #! /usr/bin/env node
-const {extractVariable} = require('../lib/main')
+// @flow
+const program = require('commander')
+const {expressionsAt, parse} = require('../lib/main')
+const getStdin = require('get-stdin')
 
-const argv = require('minimist')(process.argv.slice(2))
-const location = {
-  start: {
-    line: parseInt(argv.startl), column: parseInt(argv.startc)
-  },
-  end: {
-    line: parseInt(argv.endl), column: parseInt(argv.endc)
+program
+  .version('0.0.1')
+  .command('getExpressions <startLine> <startColumn> <endLine> <endColumn>')
+  .description('get expressions at range')
+  .action((startLine, startColumn, endLine, endColumn) => {
+    const selection = {
+      start: { line: parseInt(startLine), column: parseInt(startColumn) },
+      end: { line: parseInt(endLine), column: parseInt(endColumn) }
+    }
+
+    getExpressions(selection)
+  })
+
+program.parse(process.argv)
+
+function denormalizePosition (position) {
+  return { line: position.line - 1, column: position.column }
+}
+
+function denormalizeSelection (selection) {
+  return {
+    start: denormalizePosition(selection.start),
+    end: denormalizePosition(selection.end)
   }
 }
-const stdin = process.stdin
-const stdout = process.stdout
-const inputChunks = []
 
-stdin.resume()
-stdin.setEncoding('utf8')
+function getExpressions (selection) {
+  function serializeExpressions (expressions, file) {
+    return expressions.map(({start, end, loc}) => {
+      const selection = denormalizeSelection(loc)
+      return {
+        value: file.slice(start, end),
+        selection
+      }
+    })
+  }
 
-stdin.on('data', function (chunk) {
-  inputChunks.push(chunk)
-})
+  getStdin()
+  .then(file => {
+    const ast = parse(file)
+    const expressions = expressionsAt(ast, selection)
+    const serializedExpressions = serializeExpressions(expressions, file)
+    writeJSON({expressions: serializedExpressions})
+  })
+  .catch(err => console.log(err))
+}
 
-stdin.on('end', function () {
-  const file = inputChunks.join()
-  stdout.write(JSON.stringify({
-    newCode: extractVariable(file, location, argv.vark, argv.varn).getSourceCode()
-  }))
-})
+function writeJSON (message) {
+  process.stdout.write(JSON.stringify(message))
+}
