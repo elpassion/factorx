@@ -1,44 +1,38 @@
 // @flow
-import {tokenAt, extractVariable, parse, expressionAt} from '../src/main'
+import {
+  parse,
+  expressionsAt
+} from '../src/main'
 import * as exampleCode from './fixtures'
 
-test('tokenAt', () => {
-  const ast = parse(exampleCode.binaryExpression)
-  expect(tokenAt(ast, 1, 1).value).toEqual(5)
-  expect(tokenAt(ast, 1, 5).value).toEqual(2)
+describe('expressionsAt', () => {
+  describe('not during selection', () => {
+    describe('at start of an expression', () => {
+      test('returns all expressions containing the position', () => {
+        const location = {start: {line: 0, column: 0}, end: {line: 0, column: 0}}
+        const ast = parse(exampleCode.binaryExpression)
+        expect(expressionsAt(ast, location)).toMatchSnapshot()
 
-  const ast2 = parse(exampleCode.multiLineExpression)
-  expect(tokenAt(ast2, 2, 1).value).toEqual(5)
-  expect(tokenAt(ast2, 3, 1).value).toEqual('const')
-  expect(tokenAt(ast2, 3, 2).value).toEqual('const')
-  expect(tokenAt(ast2, 3, 7).value).toEqual('name')
-  expect(tokenAt(ast2, 3, 14).value).toEqual(5)
-})
+        const location2 = {start: {line: 0, column: 2}, end: {line: 0, column: 2}}
+        const ast2 = parse(exampleCode.binaryExpression)
+        expect(expressionsAt(ast2, location2)).toMatchSnapshot()
 
-test('expressionAt', () => {
-  const ast = parse(exampleCode.binaryExpression)
-  const selection = {start: {line: 1, column: 0}, end: {line: 1, column: 1}}
-  expect(expressionAt(ast, selection).type).toEqual('NumericLiteral')
-  const anotherSelection = {start: {line: 1, column: 0}, end: {line: 1, column: 5}}
-  expect(expressionAt(ast, anotherSelection).type).toEqual('BinaryExpression')
-})
+        const location3 = {start: {line: 0, column: 4}, end: {line: 0, column: 4}}
+        const ast3 = parse(exampleCode.binaryExpression)
+        expect(expressionsAt(ast3, location3)).toMatchSnapshot()
+      })
+    })
 
-test('extractVariable', () => {
-  let location
-  location = {start: {line: 1, column: 1}, end: {line: 1, column: 1}}
-  expect(extractVariable(exampleCode.binaryExpression, location, 'let', 'number').getSourceCode()).toMatchSnapshot()
-  location = {start: {line: 1, column: 5}, end: {line: 1, column: 5}}
-  expect(extractVariable(exampleCode.binaryExpression, location, 'let', 'number').getSourceCode()).toMatchSnapshot()
-  location = {start: {line: 1, column: 5}, end: {line: 1, column: 5}}
-  expect(extractVariable(exampleCode.binaryExpressionString, location, 'let', 'string').getSourceCode()).toMatchSnapshot()
-  location = {start: {line: 1, column: 10}, end: {line: 1, column: 10}}
-  expect(extractVariable(exampleCode.binaryExpressionString, location, 'const', 'text').getSourceCode()).toMatchSnapshot()
-  location = {start: {line: 1, column: 10}, end: {line: 1, column: 10}}
-  expect(extractVariable(exampleCode.binaryExpressionString, location, 'var', 'varText').getSourceCode()).toMatchSnapshot()
-  location = {start: {line: 1, column: 6}, end: {line: 1, column: 6}}
-  expect(extractVariable(exampleCode.binaryExpressionString, location, 'let', 'addition').getSourceCode()).toMatchSnapshot()
-  location = {start: {line: 1, column: 1}, end: {line: 1, column: 13}}
-  expect(extractVariable(exampleCode.binaryExpressionString, location, 'let', 'addition').getSourceCode()).toMatchSnapshot()
-  location = {start: {line: 1, column: 0}, end: {line: 1, column: 13}}
-  expect(extractVariable(exampleCode.binaryExpressionString, location, 'let', 'addition').getSourceCode()).toMatchSnapshot()
+    describe('at end of an expression', () => {
+      const ast = parse(exampleCode.binaryExpression)
+      test('returns all expressions containing the position', () => {
+        const location = {start: {line: 0, column: 1}, end: {line: 0, column: 1}}
+        expect(expressionsAt(ast, location)).toMatchSnapshot()
+        const location2 = {start: {line: 0, column: 3}, end: {line: 0, column: 3}}
+        expect(expressionsAt(ast, location2)).toMatchSnapshot()
+        const location3 = {start: {line: 0, column: 5}, end: {line: 0, column: 5}}
+        expect(expressionsAt(ast, location3)).toMatchSnapshot()
+      })
+    })
+  })
 })
