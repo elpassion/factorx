@@ -1,7 +1,8 @@
 // @flow
 import {
   parse,
-  expressionsAt
+  expressionsAt,
+  extractVariable
 } from '../src/main'
 import * as exampleCode from './fixtures'
 
@@ -34,5 +35,14 @@ describe('expressionsAt', () => {
         expect(expressionsAt(ast, location3)).toMatchSnapshot()
       })
     })
+  })
+})
+
+describe('extractVariable', () => {
+  test('returns an array of diffs needed to be made to extract variable', () => {
+    const location = {start: {line: 0, column: 0}, end: {line: 0, column: 1}}
+    const code = exampleCode.binaryExpression
+    const ast = parse(code)
+    expect(extractVariable(ast, location, code)).toMatchSnapshot()
   })
 })

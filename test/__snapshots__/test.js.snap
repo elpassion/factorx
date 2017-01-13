@@ -443,3 +443,32 @@ Array [
   },
 ]
 `;
+
+exports[`extractVariable returns an array of diffs needed to be made to extract variable 1`] = `
+Array [
+  Object {
+    "code": "_ref",
+    "selection": Object {
+      "end": Object {
+        "column": 1,
+        "line": 0,
+      },
+      "start": Object {
+        "column": 0,
+        "line": 0,
+      },
+    },
+    "type": "replace",
+  },
+  Object {
+    "code": "
+var _ref = 5
+",
+    "statementPositon": Position {
+      "column": 0,
+      "line": 1,
+    },
+    "type": "add",
+  },
+]
+`;

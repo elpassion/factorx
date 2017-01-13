@@ -8,13 +8,13 @@ export function parse (code: string): Object {
   return babylon.parse(code, {plugins: ['jsx', 'flow']})
 }
 
-function getExpressions (ast: Object) {
-  let expressions = []
+function getPaths (ast: Object) {
+  let paths = []
 
   traverse(ast, {
-    enter (path) { if (t.isExpression(path.node)) expressions.push(path.node) }
+    enter (path) { if (t.isExpression(path.node)) paths.push(path) }
   })
-  return expressions
+  return paths
 }
 
 type position = { line: number, column: number }
@@ -22,6 +22,10 @@ type selection = { start: position, end: position }
 
 function normalizePosition (position: position) {
   return { line: position.line + 1, column: position.column }
+}
+
+function getExpressions (paths) {
+  return paths.map((path) => path.node)
 }
 
 function normalizeSelection (selection: selection) {
@@ -33,7 +37,7 @@ function normalizeSelection (selection: selection) {
 
 export function expressionsAt (ast: Object, selection: selection) {
   const normalizedSelection = normalizeSelection(selection)
-  const allExpressions = getExpressions(ast)
+  const allExpressions = getExpressions(getPaths(ast))
 
   function isOneLineExpression (expression) {
     const expressionPosition = expression.loc
@@ -65,4 +69,41 @@ export function expressionsAt (ast: Object, selection: selection) {
       return isMultiLineExpressionInRange(expression)
     }
   })
+}
+
+function pathAt (ast: Object, selection: selection) {
+  const normalizedSelection = normalizeSelection(selection)
+  const allPaths = getPaths(ast)
+
+  function isSearchedPath (path) {
+    const expressionPosition = path.node.loc
+    return (
+      expressionPosition.start.column === normalizedSelection.start.column &&
+      expressionPosition.start.line === normalizedSelection.start.line &&
+      expressionPosition.end.column === normalizedSelection.end.column &&
+      expressionPosition.end.line === normalizedSelection.end.line
+    )
+  }
+
+  return filter(allPaths, isSearchedPath)[0]
+}
+
+export function extractVariable (ast: Object, selection: selection, code: string) {
+  const path = pathAt(ast, selection)
+  if (path) {
+    const extractedCode = code.slice(path.node.start, path.node.end)
+    let closestStatement = path.parentPath
+    while (!closestStatement.node.body) {
+      closestStatement = closestStatement.parentPath
+    }
+    const statementPositon = closestStatement.node.loc.start
+    const identifier = '_ref'
+    const insertedCode = `\nvar ${identifier} = ${extractedCode}\n`
+
+    const operations = [
+      {type: 'replace', selection, code: identifier},
+      {type: 'add', statementPositon, code: insertedCode}
+    ]
+    return operations
+  }
 }

@@ -1,6 +1,6 @@
 {
   "name": "flow-factor",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Refactoring tool based on the flow ast.",
   "main": "index.js",
   "repository": "https://github.com/michalwarda/flow-factor.git",
