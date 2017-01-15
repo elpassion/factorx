@@ -1,9 +1,9 @@
 {
-  "name": "flow-factor",
-  "version": "0.0.4",
+  "name": "factox",
+  "version": "0.1.0",
   "description": "Refactoring tool based on the flow ast.",
   "main": "index.js",
-  "repository": "https://github.com/michalwarda/flow-factor.git",
+  "repository": "https://github.com/michalwarda/factorx.git",
   "author": "Michał Warda",
   "license": "MIT",
   "scripts": {
