@@ -3,19 +3,6 @@ Array [
   Object {
     "selection": Object {
       "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
-    },
-    "value": "5 + 2",
-  },
-  Object {
-    "selection": Object {
-      "end": Object {
         "column": 1,
         "line": 0,
       },
@@ -25,6 +12,19 @@ Array [
       },
     },
     "value": "5",
+  },
+  Object {
+    "selection": Object {
+      "end": Object {
+        "column": 5,
+        "line": 0,
+      },
+      "start": Object {
+        "column": 0,
+        "line": 0,
+      },
+    },
+    "value": "5 + 2",
   },
 ]
 `;
@@ -56,11 +56,11 @@ Array [
         "line": 0,
       },
       "start": Object {
-        "column": 0,
+        "column": 4,
         "line": 0,
       },
     },
-    "value": "5 + 2",
+    "value": "2",
   },
   Object {
     "selection": Object {
@@ -69,11 +69,11 @@ Array [
         "line": 0,
       },
       "start": Object {
-        "column": 4,
+        "column": 0,
         "line": 0,
       },
     },
-    "value": "2",
+    "value": "5 + 2",
   },
 ]
 `;
@@ -101,19 +101,6 @@ Array [
   Object {
     "selection": Object {
       "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
-    },
-    "value": "5 + 2",
-  },
-  Object {
-    "selection": Object {
-      "end": Object {
         "column": 1,
         "line": 0,
       },
@@ -123,6 +110,19 @@ Array [
       },
     },
     "value": "5",
+  },
+  Object {
+    "selection": Object {
+      "end": Object {
+        "column": 5,
+        "line": 0,
+      },
+      "start": Object {
+        "column": 0,
+        "line": 0,
+      },
+    },
+    "value": "5 + 2",
   },
 ]
 `;
@@ -136,11 +136,11 @@ Array [
         "line": 0,
       },
       "start": Object {
-        "column": 0,
+        "column": 4,
         "line": 0,
       },
     },
-    "value": "5 + 2",
+    "value": "2",
   },
   Object {
     "selection": Object {
@@ -149,11 +149,11 @@ Array [
         "line": 0,
       },
       "start": Object {
-        "column": 4,
+        "column": 0,
         "line": 0,
       },
     },
-    "value": "2",
+    "value": "5 + 2",
   },
 ]
 `;

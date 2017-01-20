@@ -11,14 +11,19 @@ const {
 program
   .version('0.0.1')
   .command('get-expressions <startLine> <startColumn> <endLine> <endColumn>')
+  .option('-d, --depth [depth]', 'set the depth the expressions should be looked for')
   .description('get expressions at range')
-  .action((startLine, startColumn, endLine, endColumn) => {
+  .action((startLine, startColumn, endLine, endColumn, {depth}) => {
     const selection = {
       start: { line: parseInt(startLine), column: parseInt(startColumn) },
       end: { line: parseInt(endLine), column: parseInt(endColumn) }
     }
 
-    getExpressionsCmd(selection)
+    const options = {
+      depth: parseInt(depth)
+    }
+
+    getExpressionsCmd(selection, options)
   })
 
 program
@@ -36,9 +41,9 @@ program
 
 program.parse(process.argv)
 
-function getExpressionsCmd (selection) {
+function getExpressionsCmd (selection, options) {
   getStdin().then(file => {
-    writeJSON({expressions: findExpressions(file, selection)})
+    writeJSON({expressions: findExpressions(file, selection, options)})
   }).catch(err => console.log(err))
 }
 

@@ -5,7 +5,7 @@ describe('expressionsAt', () => {
   const binaryExpression = `5 + 2`
 
   function testfindExpressions (code, location) {
-    expect(findExpressions(code, location)).toMatchSnapshot()
+    expect(findExpressions(code, location, {})).toMatchSnapshot()
   }
 
   describe('at start of an expression', () => {

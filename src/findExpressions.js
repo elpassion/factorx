@@ -63,14 +63,16 @@ function findExpressionsAt (ast: Object, selection: selection) {
     } else {
       return isMultiLineExpressionInRange(expression)
     }
-  })
+  }).reverse()
 }
 
-export function findExpressions (code: string, selection: selection): Array<expression> {
+export function findExpressions (code: string, selection: selection, {depth = 0} : {depth?: number}): Array<expression> {
   const ast = parse(code)
   const normalizedSelection = normalizeSelection(selection)
-  return findExpressionsAt(ast, normalizedSelection).map(expression => ({
+  const expressions = findExpressionsAt(ast, normalizedSelection).map(expression => ({
     value: expression.getSourceCode(),
     selection: denormalizeSelection(expression.getLoc())
   }))
+  if (depth === 0) depth = expressions.length + 1
+  return expressions.slice(0, depth)
 }
