@@ -1,7 +1,7 @@
 {
   "name": "factorx",
-  "version": "0.1.0",
-  "description": "Refactoring tool based on the flow ast.",
+  "version": "0.1.1",
+  "description": "Refactoring tool based on ast.",
   "main": "index.js",
   "repository": "https://github.com/michalwarda/factorx.git",
   "author": "Michał Warda",
@@ -16,7 +16,7 @@
     "prepublish": "babel src -d lib"
   },
   "bin": {
-    "flow-factor": "bin/flow-factor.js"
+    "factorx": "bin/factorx.js"
   },
   "jest": {
     "testEnvironment": "node"
