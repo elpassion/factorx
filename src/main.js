@@ -1,51 +1,31 @@
 // @flow
-import * as babylon from 'babylon'
-import traverse from 'babel-traverse'
-import * as t from 'babel-types'
-import {filter} from 'lodash'
+import {Parser} from 'cst'
+import type {selection, expression} from './types'
+import {flatten} from 'lodash'
+import {normalizeSelection, denormalizeSelection} from './helpers'
 
 export function parse (code: string): Object {
-  return babylon.parse(code, {plugins: ['jsx', 'flow']})
+  return new Parser().parse(code)
 }
 
-function getPaths (ast: Object) {
-  let paths = []
-
-  traverse(ast, {
-    enter (path) { if (t.isExpression(path.node)) paths.push(path) }
-  })
-  return paths
+function findAllExpressions (ast: Object) {
+  const nodesIndex = ast._traverse._nodeIndex._index
+  return flatten(Object.keys(nodesIndex).map(nodeType =>
+    nodesIndex[nodeType].filter(node => node.isExpression)
+  ))
 }
 
-type position = { line: number, column: number }
-type selection = { start: position, end: position }
-
-function normalizePosition (position: position) {
-  return { line: position.line + 1, column: position.column }
-}
-
-function getExpressions (paths) {
-  return paths.map((path) => path.node)
-}
-
-function normalizeSelection (selection: selection) {
-  return {
-    start: normalizePosition(selection.start),
-    end: normalizePosition(selection.end)
-  }
-}
-
-export function expressionsAt (ast: Object, selection: selection) {
+function findExpressionsAt (ast: Object, selection: selection) {
   const normalizedSelection = normalizeSelection(selection)
-  const allExpressions = getExpressions(getPaths(ast))
+  const allExpressions = findAllExpressions(ast)
 
   function isOneLineExpression (expression) {
-    const expressionPosition = expression.loc
+    const expressionPosition = expression.getLoc()
     return expressionPosition.start.line === expressionPosition.end.line
   }
 
   function isOneLineExpressionInRange (expression) {
-    const expressionPosition = expression.loc
+    const expressionPosition = expression.getLoc()
     return (
       expressionPosition.start.column <= normalizedSelection.start.column &&
       expressionPosition.start.line === normalizedSelection.start.line &&
@@ -55,14 +35,14 @@ export function expressionsAt (ast: Object, selection: selection) {
   }
 
   function isMultiLineExpressionInRange (expression) {
-    const expressionPosition = expression.loc
+    const expressionPosition = expression.getLoc()
     return (
       expressionPosition.start.line <= normalizedSelection.start.line &&
       expressionPosition.end.line >= normalizedSelection.end.line
     )
   }
 
-  return filter(allExpressions, (expression) => {
+  return allExpressions.filter((expression) => {
     if (isOneLineExpression(expression)) {
       return isOneLineExpressionInRange(expression)
     } else {
@@ -71,44 +51,10 @@ export function expressionsAt (ast: Object, selection: selection) {
   })
 }
 
-function pathAt (ast: Object, selection: selection) {
-  const normalizedSelection = normalizeSelection(selection)
-  const allPaths = getPaths(ast)
-
-  function isSearchedPath (path) {
-    const expressionPosition = path.node.loc
-    return (
-      expressionPosition.start.column === normalizedSelection.start.column &&
-      expressionPosition.start.line === normalizedSelection.start.line &&
-      expressionPosition.end.column === normalizedSelection.end.column &&
-      expressionPosition.end.line === normalizedSelection.end.line
-    )
-  }
-
-  return filter(allPaths, isSearchedPath)[0]
-}
-
-export function extractVariable (ast: Object, selection: selection, code: string) {
-  const path = pathAt(ast, selection)
-
-  function denormalizePosition (position) {
-    return { line: position.line - 1, column: position.column }
-  }
-
-  if (path) {
-    const extractedCode = code.slice(path.node.start, path.node.end)
-    let closestStatement = path.parentPath
-    while (!closestStatement.node.body) {
-      closestStatement = closestStatement.parentPath
-    }
-    const statementPositon = closestStatement.node.loc.start
-    const identifier = '_ref'
-    const insertedCode = `\nvar ${identifier} = ${extractedCode}\n`
-
-    const operations = [
-      {type: 'replace', at: selection, code: identifier},
-      {type: 'add', at: denormalizePosition(statementPositon), code: insertedCode}
-    ]
-    return operations
-  }
+export function findExpressions (code: string, selection:selection): Array<expression> {
+  const ast = parse(code)
+  return findExpressionsAt(ast, selection).map(expression => ({
+    value: expression.getSourceCode(),
+    selection: denormalizeSelection(expression.getLoc())
+  }))
 }
