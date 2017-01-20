@@ -1,5 +1,5 @@
 {
-  "name": "factox",
+  "name": "factorx",
   "version": "0.1.0",
   "description": "Refactoring tool based on the flow ast.",
   "main": "index.js",

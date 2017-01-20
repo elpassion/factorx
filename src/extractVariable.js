@@ -46,7 +46,9 @@ export function extractVariable (code: string, selection: selection): string {
   const identifier = createIdentifier()
   const VD = createVariableDeclaration(identifier, expression)
   const {parent, child} = findExpressionScope(expression)
+
   parent.insertChildBefore(VD, child)
   expression.parentElement.replaceChild(identifier, expression)
+
   return ast.getSourceCode()
 }

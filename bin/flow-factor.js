@@ -3,7 +3,10 @@
 const program = require('commander')
 const getStdin = require('get-stdin')
 
-const {findExpressions} = require('../lib/main')
+const {
+  findExpressions,
+  extractVariable
+} = require('../lib/main')
 
 program
   .version('0.0.1')
@@ -15,14 +18,33 @@ program
       end: { line: parseInt(endLine), column: parseInt(endColumn) }
     }
 
-    getExpressions(selection)
+    getExpressionsCmd(selection)
+  })
+
+program
+  .version('0.0.1')
+  .command('extract-variable <startLine> <startColumn> <endLine> <endColumn>')
+  .description('extract variable at range')
+  .action((startLine, startColumn, endLine, endColumn) => {
+    const selection = {
+      start: { line: parseInt(startLine), column: parseInt(startColumn) },
+      end: { line: parseInt(endLine), column: parseInt(endColumn) }
+    }
+
+    extractVariableCmd(selection)
   })
 
 program.parse(process.argv)
 
-function getExpressions (selection) {
+function getExpressionsCmd (selection) {
   getStdin().then(file => {
     writeJSON({expressions: findExpressions(file, selection)})
+  }).catch(err => console.log(err))
+}
+
+function extractVariableCmd (selection) {
+  getStdin().then(file => {
+    writeJSON({code: extractVariable(file, selection)})
   }).catch(err => console.log(err))
 }
 
