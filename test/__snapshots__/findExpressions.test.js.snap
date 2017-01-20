@@ -93,19 +93,6 @@ Array [
     },
     "value": "5 + 2",
   },
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 1,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
-    },
-    "value": "5",
-  },
 ]
 `;
 
@@ -123,6 +110,19 @@ Array [
       },
     },
     "value": "5 + 2",
+  },
+  Object {
+    "selection": Object {
+      "end": Object {
+        "column": 1,
+        "line": 0,
+      },
+      "start": Object {
+        "column": 0,
+        "line": 0,
+      },
+    },
+    "value": "5",
   },
 ]
 `;

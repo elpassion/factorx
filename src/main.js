@@ -16,7 +16,6 @@ function findAllExpressions (ast: Object) {
 }
 
 function findExpressionsAt (ast: Object, selection: selection) {
-  const normalizedSelection = normalizeSelection(selection)
   const allExpressions = findAllExpressions(ast)
 
   function isOneLineExpression (expression) {
@@ -27,18 +26,18 @@ function findExpressionsAt (ast: Object, selection: selection) {
   function isOneLineExpressionInRange (expression) {
     const expressionPosition = expression.getLoc()
     return (
-      expressionPosition.start.column <= normalizedSelection.start.column &&
-      expressionPosition.start.line === normalizedSelection.start.line &&
-      expressionPosition.end.column >= normalizedSelection.end.column &&
-      expressionPosition.end.line === normalizedSelection.end.line
+      expressionPosition.start.column <= selection.start.column &&
+      expressionPosition.start.line === selection.start.line &&
+      expressionPosition.end.column >= selection.end.column &&
+      expressionPosition.end.line === selection.end.line
     )
   }
 
   function isMultiLineExpressionInRange (expression) {
     const expressionPosition = expression.getLoc()
     return (
-      expressionPosition.start.line <= normalizedSelection.start.line &&
-      expressionPosition.end.line >= normalizedSelection.end.line
+      expressionPosition.start.line <= selection.start.line &&
+      expressionPosition.end.line >= selection.end.line
     )
   }
 
@@ -51,9 +50,10 @@ function findExpressionsAt (ast: Object, selection: selection) {
   })
 }
 
-export function findExpressions (code: string, selection:selection): Array<expression> {
+export function findExpressions (code: string, selection: selection): Array<expression> {
   const ast = parse(code)
-  return findExpressionsAt(ast, selection).map(expression => ({
+  const normalizedSelection = normalizeSelection(selection)
+  return findExpressionsAt(ast, normalizedSelection).map(expression => ({
     value: expression.getSourceCode(),
     selection: denormalizeSelection(expression.getLoc())
   }))

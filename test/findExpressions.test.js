@@ -10,8 +10,8 @@ describe('expressionsAt', () => {
 
   describe('at start of an expression', () => {
     test('returns all expressions containing the position', () => {
-      testfindExpressions(binaryExpression, {start: {line: 0, column: 0}, end: {line: 0, column: 0}})
       testfindExpressions(binaryExpression, {start: {line: 0, column: 2}, end: {line: 0, column: 2}})
+      testfindExpressions(binaryExpression, {start: {line: 0, column: 0}, end: {line: 0, column: 0}})
       testfindExpressions(binaryExpression, {start: {line: 0, column: 4}, end: {line: 0, column: 4}})
     })
   })
