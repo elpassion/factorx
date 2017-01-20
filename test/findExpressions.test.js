@@ -1,11 +1,11 @@
 // @flow
-import { findExpressions } from '../src/main'
+import { findExpressions } from '../src/findExpressions'
 
 describe('expressionsAt', () => {
   const binaryExpression = `5 + 2`
 
-  function testfindExpressions (expression, location) {
-    expect(findExpressions(expression, location)).toMatchSnapshot()
+  function testfindExpressions (code, location) {
+    expect(findExpressions(code, location)).toMatchSnapshot()
   }
 
   describe('at start of an expression', () => {

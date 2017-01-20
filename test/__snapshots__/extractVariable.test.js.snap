@@ -1,0 +1,14 @@
+exports[`extractVariable correctly extracts variable 1`] = `
+"const _ref = 5
+_ref + 2"
+`;
+
+exports[`extractVariable correctly extracts variable 2`] = `
+"const _ref = 5 + 2
+_ref"
+`;
+
+exports[`extractVariable correctly extracts variable 3`] = `
+"const _ref = 2
+5 + _ref"
+`;

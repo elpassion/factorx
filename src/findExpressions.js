@@ -4,7 +4,7 @@ import type {selection, expression} from './types'
 import {flatten} from 'lodash'
 import {normalizeSelection, denormalizeSelection} from './helpers'
 
-export function parse (code: string): Object {
+function parse (code: string): Object {
   return new Parser().parse(code)
 }
 
@@ -13,6 +13,22 @@ function findAllExpressions (ast: Object) {
   return flatten(Object.keys(nodesIndex).map(nodeType =>
     nodesIndex[nodeType].filter(node => node.isExpression)
   ))
+}
+
+export function findSelectedExpression (ast: Object, selection: selection) {
+  const allExpressions = findAllExpressions(ast)
+
+  function isSearchedExpression (expression) {
+    const expressionPosition = expression.getLoc()
+    return (
+      expressionPosition.start.column === selection.start.column &&
+      expressionPosition.start.line === selection.start.line &&
+      expressionPosition.end.column === selection.end.column &&
+      expressionPosition.end.line === selection.end.line
+    )
+  }
+
+  return allExpressions.find(isSearchedExpression)
 }
 
 function findExpressionsAt (ast: Object, selection: selection) {
