@@ -20,7 +20,7 @@ program
     }
 
     const options = {
-      depth: parseInt(depth)
+      depth: depth ? parseInt(depth) : 0
     }
 
     getExpressionsCmd(selection, options)
