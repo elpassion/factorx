@@ -63,7 +63,11 @@ function findExpressionsAt (ast: Object, selection: selection) {
     } else {
       return isMultiLineExpressionInRange(expression)
     }
-  }).reverse()
+  }).sort((previousExpression, nextExpression) => {
+    const previousRange = previousExpression.getRange()
+    const nextRange = nextExpression.getRange()
+    return (previousRange[1] - previousRange[0]) - (nextRange[1] - nextRange[0])
+  })
 }
 
 export function findExpressions (code: string, selection: selection, {depth = 0} : {depth?: number}): Array<expression> {
