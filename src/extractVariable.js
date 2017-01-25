@@ -13,7 +13,7 @@ function createIdentifier () {
   return new Identifier([new Token('Identifier', '_ref')])
 }
 
-function createVariableDeclaration (identifier, expression) {
+function createVariableDeclaration (identifier, expression, whitespace) {
   return new VariableDeclaration([
     new Token('Keyword', 'const'),
     new Token('Whitespace', ' '),
@@ -25,7 +25,7 @@ function createVariableDeclaration (identifier, expression) {
       new Token('Whitespace', ' '),
       expression.cloneElement()
     ]),
-    new Token('Whitespace', '\n')
+    new Token('Whitespace', whitespace)
   ])
 }
 
@@ -45,9 +45,10 @@ export function extractVariable (code: string, selection: selection): string {
   const expression = findSelectedExpression(ast, normalizedSelection)
   if (!expression) throw new ExpressionNotFoundError()
   const identifier = createIdentifier()
-  const VD = createVariableDeclaration(identifier, expression)
   const {parent, child} = findExpressionScope(expression)
-
+  const possibleWhitespace = child.getFirstToken().getPreviousToken()
+  const whitespace = (possibleWhitespace && possibleWhitespace.isWhitespace) ? possibleWhitespace.getSourceCode() : '\n'
+  const VD = createVariableDeclaration(identifier, expression, whitespace)
   parent.insertChildBefore(VD, child)
   expression.parentElement.replaceChild(identifier, expression)
 

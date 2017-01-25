@@ -12,3 +12,24 @@ exports[`extractVariable correctly extracts variable 3`] = `
 "const _ref = 2
 5 + _ref"
 `;
+
+exports[`extractVariable correctly extracts variable 4`] = `
+"() => {
+  const _ref = 5
+  _ref + 5
+}"
+`;
+
+exports[`extractVariable correctly extracts variable 5`] = `
+"() => {
+  const _ref = 5
+  5 + _ref
+}"
+`;
+
+exports[`extractVariable correctly extracts variable 6`] = `
+"() => {
+  const _ref = 5 + 5
+  _ref
+}"
+`;
