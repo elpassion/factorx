@@ -1,4 +1,22 @@
-exports[`expressionsAt at end of an expression returns all expressions containing the position 1`] = `
+exports[`findExpressions when exact at start of an expression returns all expressions containing the position 1`] = `
+Array [
+  Object {
+    "selection": Object {
+      "end": Object {
+        "column": 5,
+        "line": 0,
+      },
+      "start": Object {
+        "column": 0,
+        "line": 0,
+      },
+    },
+    "value": "5 + 2",
+  },
+]
+`;
+
+exports[`findExpressions when exact at start of an expression returns all expressions containing the position 2`] = `
 Array [
   Object {
     "selection": Object {
@@ -29,25 +47,7 @@ Array [
 ]
 `;
 
-exports[`expressionsAt at end of an expression returns all expressions containing the position 2`] = `
-Array [
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
-    },
-    "value": "5 + 2",
-  },
-]
-`;
-
-exports[`expressionsAt at end of an expression returns all expressions containing the position 3`] = `
+exports[`findExpressions when exact at start of an expression returns all expressions containing the position 3`] = `
 Array [
   Object {
     "selection": Object {
@@ -78,25 +78,7 @@ Array [
 ]
 `;
 
-exports[`expressionsAt at start of an expression returns all expressions containing the position 1`] = `
-Array [
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
-    },
-    "value": "5 + 2",
-  },
-]
-`;
-
-exports[`expressionsAt at start of an expression returns all expressions containing the position 2`] = `
+exports[`findExpressions when not exact at end of an expression returns all expressions containing the position 1`] = `
 Array [
   Object {
     "selection": Object {
@@ -127,7 +109,105 @@ Array [
 ]
 `;
 
-exports[`expressionsAt at start of an expression returns all expressions containing the position 3`] = `
+exports[`findExpressions when not exact at end of an expression returns all expressions containing the position 2`] = `
+Array [
+  Object {
+    "selection": Object {
+      "end": Object {
+        "column": 5,
+        "line": 0,
+      },
+      "start": Object {
+        "column": 0,
+        "line": 0,
+      },
+    },
+    "value": "5 + 2",
+  },
+]
+`;
+
+exports[`findExpressions when not exact at end of an expression returns all expressions containing the position 3`] = `
+Array [
+  Object {
+    "selection": Object {
+      "end": Object {
+        "column": 5,
+        "line": 0,
+      },
+      "start": Object {
+        "column": 4,
+        "line": 0,
+      },
+    },
+    "value": "2",
+  },
+  Object {
+    "selection": Object {
+      "end": Object {
+        "column": 5,
+        "line": 0,
+      },
+      "start": Object {
+        "column": 0,
+        "line": 0,
+      },
+    },
+    "value": "5 + 2",
+  },
+]
+`;
+
+exports[`findExpressions when not exact at start of an expression returns all expressions containing the position 1`] = `
+Array [
+  Object {
+    "selection": Object {
+      "end": Object {
+        "column": 5,
+        "line": 0,
+      },
+      "start": Object {
+        "column": 0,
+        "line": 0,
+      },
+    },
+    "value": "5 + 2",
+  },
+]
+`;
+
+exports[`findExpressions when not exact at start of an expression returns all expressions containing the position 2`] = `
+Array [
+  Object {
+    "selection": Object {
+      "end": Object {
+        "column": 1,
+        "line": 0,
+      },
+      "start": Object {
+        "column": 0,
+        "line": 0,
+      },
+    },
+    "value": "5",
+  },
+  Object {
+    "selection": Object {
+      "end": Object {
+        "column": 5,
+        "line": 0,
+      },
+      "start": Object {
+        "column": 0,
+        "line": 0,
+      },
+    },
+    "value": "5 + 2",
+  },
+]
+`;
+
+exports[`findExpressions when not exact at start of an expression returns all expressions containing the position 3`] = `
 Array [
   Object {
     "selection": Object {

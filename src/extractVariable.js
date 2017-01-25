@@ -3,7 +3,7 @@ import type {selection} from './types'
 import {Token, Parser, types} from 'cst'
 const {VariableDeclarator, VariableDeclaration, Identifier} = types
 import {normalizeSelection} from './helpers'
-import {findSelectedExpression} from './findExpressions'
+import {findSelectedExpression, ExpressionNotFoundError} from './findExpressions'
 
 function parse (code: string): Object {
   return new Parser().parse(code)
@@ -43,6 +43,7 @@ export function extractVariable (code: string, selection: selection): string {
   const normalizedSelection = normalizeSelection(selection)
   const ast = parse(code)
   const expression = findSelectedExpression(ast, normalizedSelection)
+  if (!expression) throw new ExpressionNotFoundError()
   const identifier = createIdentifier()
   const VD = createVariableDeclaration(identifier, expression)
   const {parent, child} = findExpressionScope(expression)

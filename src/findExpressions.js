@@ -1,7 +1,7 @@
 // @flow
 import {Parser} from 'cst'
 import type {selection, expression} from './types'
-import {flatten} from 'lodash'
+import {flatten, compact} from 'lodash'
 import {normalizeSelection, denormalizeSelection} from './helpers'
 
 function parse (code: string): Object {
@@ -15,7 +15,7 @@ function findAllExpressions (ast: Object) {
   ))
 }
 
-export function findSelectedExpression (ast: Object, selection: selection) {
+export function findSelectedExpression (ast: Object, selection: selection): ?Object {
   const allExpressions = findAllExpressions(ast)
 
   function isSearchedExpression (expression) {
@@ -70,13 +70,48 @@ function findExpressionsAt (ast: Object, selection: selection) {
   })
 }
 
-export function findExpressions (code: string, selection: selection, {depth = 0} : {depth?: number}): Array<expression> {
-  const ast = parse(code)
-  const normalizedSelection = normalizeSelection(selection)
-  const expressions = findExpressionsAt(ast, normalizedSelection).map(expression => ({
+const defaultOptions = {
+  depth: 0,
+  exact: false
+}
+
+type findExpressionsOptions = {
+  depth: number,
+  exact: boolean
+}
+
+function formatExpression (expression) {
+  return {
     value: expression.getSourceCode(),
     selection: denormalizeSelection(expression.getLoc())
-  }))
-  if (depth === 0) depth = expressions.length + 1
-  return expressions.slice(0, depth)
+  }
+}
+
+export function findExpressions (
+  code: string,
+  selection: selection,
+  options: findExpressionsOptions = defaultOptions
+): Array<expression> {
+  const ast = parse(code)
+  const normalizedSelection = normalizeSelection(selection)
+  let expressions
+  if (options.exact) {
+    expressions = compact([findSelectedExpression(ast, normalizedSelection)])
+  } else {
+    expressions = findExpressionsAt(ast, normalizedSelection)
+  }
+  if (expressions.length === 0) {
+    throw new ExpressionNotFoundError()
+  } else {
+    return expressions
+      .slice(0, options.depth || expressions.length + 1)
+      .map(formatExpression)
+  }
+}
+
+export class ExpressionNotFoundError extends Error {
+  constructor (message?: string) {
+    super(message)
+    this.name = 'ExpressionNotFoundError'
+  }
 }
