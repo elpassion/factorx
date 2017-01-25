@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "flow": "flow",
-    "build": "babel src -d lib",
+    "build": "babel src -d lib && cp -r ./lib/cli.js ./bin/factorx.js",
     "test": "jest",
     "watch": "jest --watch",
     "flow-typed": "flow-typed install",
@@ -33,7 +33,7 @@
     "babel-jest": "^18.0.0",
     "babel-plugin-syntax-flow": "^6.18.0",
     "babel-plugin-transform-flow-strip-types": "^6.21.0",
-    "babel-polyfill": "^6.20.0",
+    "babel-polyfill": "^6.22.0",
     "babel-preset-env": "^1.1.4",
     "babel-preset-stage-0": "^6.16.0",
     "eslint": "^3.12.2",

@@ -1,9 +1,10 @@
 // @flow
 
-import {findExpressions} from './findExpressions'
+import {findExpressions, ExpressionNotFoundError} from './findExpressions'
 import {extractVariable} from './extractVariable'
 
 export {
   findExpressions,
-  extractVariable
+  extractVariable,
+  ExpressionNotFoundError
 }
