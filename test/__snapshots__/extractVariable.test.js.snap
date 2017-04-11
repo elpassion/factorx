@@ -1,3 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`extractVariable correctly extracts variable 1`] = `
 "const _ref = 5
 _ref + 2"

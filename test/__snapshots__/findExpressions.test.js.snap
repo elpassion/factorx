@@ -1,3 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`findExpressions when exact at start of an expression returns all expressions containing the position 1`] = `
 Array [
   Object {
