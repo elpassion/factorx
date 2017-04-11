@@ -1,13 +1,9 @@
 module.exports = {
-  "parser": "babel-eslint",
-  "extends": "standard",
-  "plugins": [
-    "standard",
-    "promise",
-    "flowtype"
-  ],
-  "env": {
-    "node": true,
-    "jest": true
+  parser: 'babel-eslint',
+  extends: 'airbnb-base',
+  plugins: ['import', 'promise', 'flowtype'],
+  env: {
+    node: true,
+    jest: true,
   },
 };
