@@ -1,128 +1,30 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`findExpressions when exact at start of an expression returns all expressions containing the position 1`] = `
-Array [
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
-    },
-    "value": "5 + 2",
-  },
-]
-`;
-
-exports[`findExpressions when exact at start of an expression returns all expressions containing the position 2`] = `
-Array [
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 1,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
-    },
-    "value": "5",
-  },
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
-    },
-    "value": "5 + 2",
-  },
-]
-`;
-
-exports[`findExpressions when exact at start of an expression returns all expressions containing the position 3`] = `
-Array [
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 4,
-        "line": 0,
-      },
-    },
-    "value": "2",
-  },
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
-    },
-    "value": "5 + 2",
-  },
-]
-`;
-
 exports[`findExpressions when not exact at end of an expression returns all expressions containing the position 1`] = `
 Array [
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 1,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
-    },
-    "value": "5",
-  },
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
+  Expression {
+    "position": Position {
+      "end": 5,
+      "start": 0,
     },
     "value": "5 + 2",
+  },
+  Expression {
+    "position": Position {
+      "end": 1,
+      "start": 0,
+    },
+    "value": "5",
   },
 ]
 `;
 
 exports[`findExpressions when not exact at end of an expression returns all expressions containing the position 2`] = `
 Array [
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
+  Expression {
+    "position": Position {
+      "end": 5,
+      "start": 0,
     },
     "value": "5 + 2",
   },
@@ -131,78 +33,48 @@ Array [
 
 exports[`findExpressions when not exact at end of an expression returns all expressions containing the position 3`] = `
 Array [
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 4,
-        "line": 0,
-      },
-    },
-    "value": "2",
-  },
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
+  Expression {
+    "position": Position {
+      "end": 5,
+      "start": 0,
     },
     "value": "5 + 2",
+  },
+  Expression {
+    "position": Position {
+      "end": 5,
+      "start": 4,
+    },
+    "value": "2",
   },
 ]
 `;
 
 exports[`findExpressions when not exact at start of an expression returns all expressions containing the position 1`] = `
 Array [
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
+  Expression {
+    "position": Position {
+      "end": 5,
+      "start": 0,
     },
     "value": "5 + 2",
+  },
+  Expression {
+    "position": Position {
+      "end": 1,
+      "start": 0,
+    },
+    "value": "5",
   },
 ]
 `;
 
 exports[`findExpressions when not exact at start of an expression returns all expressions containing the position 2`] = `
 Array [
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 1,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
-    },
-    "value": "5",
-  },
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
+  Expression {
+    "position": Position {
+      "end": 5,
+      "start": 0,
     },
     "value": "5 + 2",
   },
@@ -211,31 +83,19 @@ Array [
 
 exports[`findExpressions when not exact at start of an expression returns all expressions containing the position 3`] = `
 Array [
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 4,
-        "line": 0,
-      },
-    },
-    "value": "2",
-  },
-  Object {
-    "selection": Object {
-      "end": Object {
-        "column": 5,
-        "line": 0,
-      },
-      "start": Object {
-        "column": 0,
-        "line": 0,
-      },
+  Expression {
+    "position": Position {
+      "end": 5,
+      "start": 0,
     },
     "value": "5 + 2",
+  },
+  Expression {
+    "position": Position {
+      "end": 5,
+      "start": 4,
+    },
+    "value": "2",
   },
 ]
 `;

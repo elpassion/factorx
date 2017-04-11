@@ -41,17 +41,17 @@ async function extractVariableCmd(selection) {
   }
 }
 
-(() => {
-  async function getExpressionsCmd(selection, options) {
-    const file = await getStdin();
-    try {
-      const expressions = findExpressions(file, selection, options);
-      writeJSON({ status: 'ok', expressions });
-    } catch (error) {
-      writeJSON(createMessageFromError(error));
-    }
+async function getExpressionsCmd(selection, options) {
+  const file = await getStdin();
+  try {
+    const expressions = findExpressions(file, selection, options);
+    writeJSON({ status: 'ok', expressions });
+  } catch (error) {
+    writeJSON(createMessageFromError(error));
   }
+}
 
+(() => {
   program
     .command('get-expressions <startLine> <startColumn> <endLine> <endColumn>')
     .option('-d, --depth [depth]', 'set the depth the expressions should be looked for')
