@@ -1,10 +1,6 @@
 // @flow
 
-import {findExpressions, ExpressionNotFoundError} from './findExpressions'
-import {extractVariable} from './extractVariable'
+import { findExpressions, ExpressionNotFoundError } from './findExpressions';
+import { extractVariable } from './extractVariable';
 
-export {
-  findExpressions,
-  extractVariable,
-  ExpressionNotFoundError
-}
+export { findExpressions, extractVariable, ExpressionNotFoundError };
