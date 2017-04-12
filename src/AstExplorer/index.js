@@ -37,6 +37,26 @@ export default class AstExplorer {
     return nodes.map(this.serializeNode);
   }
 
+  extractVariable(selection: Position): string {
+    let extracted = false;
+    this.transform(({ types }) => ({
+      visitor: {
+        Expression: (path) => {
+          const { node } = path;
+          if (!node.visited && node.start === selection.start && node.end === selection.end) {
+            node.visited = true;
+            const id = path.scope.generateUidIdentifierBasedOnNode(node.id);
+            path.scope.push({ id, init: path.node });
+            path.replaceWith(types.identifier(id.name));
+            extracted = true;
+          }
+        },
+      },
+    }));
+    if (!extracted) throw new ExpressionNotFoundError();
+    return this.code;
+  }
+
   transform(plugin: Function) {
     const { code, map, ast } = babel.transformFromAst(this.ast, this.code, {
       ...options,

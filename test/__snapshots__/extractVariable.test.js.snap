@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`extractVariable with correct selection returns correct code 1`] = `
+"var _ref = 5;
+_ref + 2"
+`;
+
+exports[`extractVariable with correct selection returns correct code 2`] = `
+"var _ref = 2;
+5 + _ref"
+`;
+
+exports[`extractVariable with correct selection returns correct code 3`] = `
+"var _ref = 5 + 2;
+_ref"
+`;
+
+exports[`extractVariable with correct selection returns correct code 4`] = `
+"() => {
+  var _ref = 5;
+  _ref + 2
+}"
+`;

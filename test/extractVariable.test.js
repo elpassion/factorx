@@ -1,34 +1,27 @@
 // @flow
-// import { extractVariable } from '../src/extractVariable';
-// import ExpressionNotFoundError from '../src/ExpressionNotFoundError';
+import ExpressionNotFoundError from '../src/ExpressionNotFoundError';
+import AstExplorer from '../src/AstExplorer';
+import Position from '../src/Position';
 
 describe('extractVariable', () => {
-  test('nothing', () => {});
-  // const binaryExpression = '5 + 2';
-  // const expressionInsideFunction = '() => {\n  5 + 5\n}';
-  //
-  // function testExtractVariable(code, selection) {
-  //   expect(extractVariable(code, selection)).toMatchSnapshot();
-  // }
-  //
-  // function testExtractVariableThrows(code, selection) {
-  //   const extractVariableWithUnexistingExpression = () => {
-  //     extractVariable(code, selection);
-  //   };
-  //   expect(extractVariableWithUnexistingExpression).toThrowError(new ExpressionNotFoundError());
-  // }
-  //
-  // test('correctly extracts variable', () => {
-  //   testExtractVariable(binaryExpression, 0, 1);
-  //   testExtractVariable(binaryExpression, 0, 5);
-  //   testExtractVariable(binaryExpression, 4, 5);
-  //   testExtractVariable(expressionInsideFunction, 10, 11);
-  //   testExtractVariable(expressionInsideFunction, 14, 15);
-  //   testExtractVariable(expressionInsideFunction, 10, 15);
-  // });
-  //
-  // test('throws when selection is not an expression', () => {
-  //   testExtractVariableThrows(binaryExpression, 42, 42);
-  //   testExtractVariableThrows(binaryExpression, 100, 100);
-  // });
+  const expectExtractVariable = (code, start, end) => {
+    const astExplorer = new AstExplorer(code);
+    expect(astExplorer.extractVariable(new Position(start, end))).toMatchSnapshot();
+  };
+  describe('with correct selection', () => {
+    test('returns correct code', () => {
+      expectExtractVariable('5 + 2', 0, 1);
+      expectExtractVariable('5 + 2', 4, 5);
+      expectExtractVariable('5 + 2', 0, 5);
+      expectExtractVariable('() => {\n  5 + 2\n}', 10, 11);
+    });
+  });
+
+  describe('when incorrect selection', () => {
+    test('throws an error', () => {
+      expect(() => {
+        new AstExplorer('5 + 2').extractVariable(new Position(42, 42));
+      }).toThrowError(new ExpressionNotFoundError());
+    });
+  });
 });
