@@ -22,18 +22,23 @@ export default class AstExplorer {
   serializeNode = (node: Object) => Expression.fromNode(this.code, node);
 
   findExpressions(selection: Position): Array<Expression> {
-    const nodes = [];
+    const paths = [];
     this.transform(() => ({
       visitor: {
-        Expression({ node }) {
-          if (selection.includes(node)) {
-            nodes.push(node);
+        Expression(path) {
+          if (selection.includes(path.node)) {
+            paths.push(path);
           }
         },
       },
     }));
-    if (nodes.length === 0) throw new ExpressionNotFoundError();
-    return nodes.map(this.serializeNode);
+    if (paths.length === 0) throw new ExpressionNotFoundError();
+    let parentBlock = paths[paths.length - 1].scope.block;
+    if (parentBlock.type === 'ArrowFunctionExpression') parentBlock = parentBlock.body;
+    return paths
+      .filter(path => parentBlock.start <= path.node.start && parentBlock.end >= path.node.end)
+      .map(path => path.node)
+      .map(this.serializeNode);
   }
 
   extractVariable(selection: Position): string {

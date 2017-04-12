@@ -5,6 +5,9 @@ import Position from '../src/Position';
 
 describe('findExpressions', () => {
   const binaryExpression = '5 + 2';
+  const functionCode = '() => { 5 + 2 }';
+  const ifStatement = '() => { if(5 > 3) { const u = 69 } }';
+  const nestedFunctionCode = 'function a() {\n  function b() { 2 + 2 }\n const a = 5; }';
 
   const expectFindExpressions = (code, start, end) => {
     const astExplorer = new AstExplorer(code);
@@ -12,10 +15,15 @@ describe('findExpressions', () => {
   };
 
   describe('at start of an expression', () => {
-    it('returns all expressions containing the position', () => {
+    it('returns all expressions containing the position at start of the expression', () => {
       expectFindExpressions(binaryExpression, 0, 0);
       expectFindExpressions(binaryExpression, 2, 2);
       expectFindExpressions(binaryExpression, 4, 4);
+      expectFindExpressions(functionCode, 8, 8);
+      expectFindExpressions(functionCode, 10, 10);
+      expectFindExpressions(functionCode, 12, 12);
+      expectFindExpressions(nestedFunctionCode, 32, 32);
+      expectFindExpressions(ifStatement, 11, 11);
     });
   });
 
