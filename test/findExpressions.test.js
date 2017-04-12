@@ -27,10 +27,21 @@ describe('findExpressions', () => {
     });
   });
 
+  describe('when selecting the expression fully', () => {
+    it('returns only the selected expression', () => {
+      expectFindExpressions(binaryExpression, 0, 1);
+      expectFindExpressions(binaryExpression, 0, 5);
+      expectFindExpressions(binaryExpression, 4, 5);
+    });
+  });
+
   describe('when not inside an expression', () => {
     it('throws an error', () => {
       expect(() => {
         new AstExplorer('5 + 2').findExpressions(new Position(42, 42));
+      }).toThrowError(new ExpressionNotFoundError());
+      expect(() => {
+        new AstExplorer('5 + 2').findExpressions(new Position(0, 3));
       }).toThrowError(new ExpressionNotFoundError());
     });
   });

@@ -11,7 +11,6 @@ export default class AstExplorer {
   ast: Object;
   map: Object;
   stop: Function;
-  program: Object;
 
   constructor(input: string) {
     const { code, map, ast } = babel.transform(input, options);
@@ -26,9 +25,9 @@ export default class AstExplorer {
     const nodes = [];
     this.transform(() => ({
       visitor: {
-        Expression(path) {
-          if (path.node.start <= selection.start && path.node.end >= selection.end) {
-            nodes.push(path.node);
+        Expression({ node }) {
+          if (selection.includes(node)) {
+            nodes.push(node);
           }
         },
       },
@@ -43,7 +42,7 @@ export default class AstExplorer {
       visitor: {
         Expression: (path) => {
           const { node } = path;
-          if (!node.visited && node.start === selection.start && node.end === selection.end) {
+          if (!node.visited && selection.includes(node)) {
             node.visited = true;
             const id = path.scope.generateUidIdentifierBasedOnNode(node.id);
             path.scope.push({ id, init: path.node });

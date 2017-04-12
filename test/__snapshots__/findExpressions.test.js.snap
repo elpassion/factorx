@@ -99,3 +99,39 @@ Array [
   },
 ]
 `;
+
+exports[`findExpressions when selecting the expression fully returns only the selected expression 1`] = `
+Array [
+  Expression {
+    "position": Position {
+      "end": 1,
+      "start": 0,
+    },
+    "value": "5",
+  },
+]
+`;
+
+exports[`findExpressions when selecting the expression fully returns only the selected expression 2`] = `
+Array [
+  Expression {
+    "position": Position {
+      "end": 5,
+      "start": 0,
+    },
+    "value": "5 + 2",
+  },
+]
+`;
+
+exports[`findExpressions when selecting the expression fully returns only the selected expression 3`] = `
+Array [
+  Expression {
+    "position": Position {
+      "end": 5,
+      "start": 4,
+    },
+    "value": "2",
+  },
+]
+`;
