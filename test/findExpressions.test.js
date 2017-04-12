@@ -40,6 +40,7 @@ describe('findExpressions', () => {
       expectFindExpressions(binaryExpression, 0, 1);
       expectFindExpressions(binaryExpression, 0, 5);
       expectFindExpressions(binaryExpression, 4, 5);
+      expectFindExpressions(functionCode, 0, 15);
     });
   });
 

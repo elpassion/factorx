@@ -1,25 +1,26 @@
-import recast from 'recast';
+// @flow
+import babylon from 'recast';
 
 const options = {
-  parserOpts: {
-    parser: recast.parse,
-    plugins: [
-      'asyncGenerators',
-      'classConstructorCall',
-      'classProperties',
-      'decorators',
-      'doExpressions',
-      'exportExtensions',
-      'flow',
-      'functionSent',
-      'functionBind',
-      'jsx',
-      'objectRestSpread',
-      'dynamicImport',
-    ],
-  },
-  generatorOpts: {
-    generator: recast.print,
+  parser: {
+    parse(source: string) {
+      return babylon.parse(source, {
+        plugins: [
+          'asyncGenerators',
+          'classConstructorCall',
+          'classProperties',
+          'decorators',
+          'doExpressions',
+          'exportExtensions',
+          'flow',
+          'functionSent',
+          'functionBind',
+          'jsx',
+          'objectRestSpread',
+          'dynamicImport',
+        ],
+      });
+    },
   },
 };
 

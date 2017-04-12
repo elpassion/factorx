@@ -223,3 +223,15 @@ Array [
   },
 ]
 `;
+
+exports[`findExpressions when selecting the expression fully returns only the selected expression 4`] = `
+Array [
+  Expression {
+    "position": Position {
+      "end": 15,
+      "start": 0,
+    },
+    "value": "() => { 5 + 2 }",
+  },
+]
+`;
