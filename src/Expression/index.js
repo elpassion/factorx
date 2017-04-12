@@ -11,7 +11,7 @@ export default class Expression {
     this.position = new Position(start, end);
   }
 
-  static fromNode(node: Object, code: string): Expression {
+  static fromNode(code: string, node: Object) {
     return new Expression(code.slice(node.start, node.end), node.start, node.end);
   }
 }

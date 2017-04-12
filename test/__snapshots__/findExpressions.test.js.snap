@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`findExpressions when not exact at end of an expression returns all expressions containing the position 1`] = `
+exports[`findExpressions at end of an expression returns all expressions containing the position 1`] = `
 Array [
   Expression {
     "position": Position {
@@ -19,7 +19,7 @@ Array [
 ]
 `;
 
-exports[`findExpressions when not exact at end of an expression returns all expressions containing the position 2`] = `
+exports[`findExpressions at end of an expression returns all expressions containing the position 2`] = `
 Array [
   Expression {
     "position": Position {
@@ -31,7 +31,7 @@ Array [
 ]
 `;
 
-exports[`findExpressions when not exact at end of an expression returns all expressions containing the position 3`] = `
+exports[`findExpressions at end of an expression returns all expressions containing the position 3`] = `
 Array [
   Expression {
     "position": Position {
@@ -50,7 +50,7 @@ Array [
 ]
 `;
 
-exports[`findExpressions when not exact at start of an expression returns all expressions containing the position 1`] = `
+exports[`findExpressions at start of an expression returns all expressions containing the position 1`] = `
 Array [
   Expression {
     "position": Position {
@@ -69,7 +69,7 @@ Array [
 ]
 `;
 
-exports[`findExpressions when not exact at start of an expression returns all expressions containing the position 2`] = `
+exports[`findExpressions at start of an expression returns all expressions containing the position 2`] = `
 Array [
   Expression {
     "position": Position {
@@ -81,7 +81,7 @@ Array [
 ]
 `;
 
-exports[`findExpressions when not exact at start of an expression returns all expressions containing the position 3`] = `
+exports[`findExpressions at start of an expression returns all expressions containing the position 3`] = `
 Array [
   Expression {
     "position": Position {
