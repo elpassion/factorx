@@ -3,49 +3,61 @@
 import 'babel-polyfill';
 import program from 'commander';
 import getStdin from 'get-stdin';
-import { findExpressions, extractVariable } from '../lib/main';
-
-function createSelection(startLine, startColumn, endLine, endColumn) {
-  return {
-    start: { line: parseInt(startLine, 10), column: parseInt(startColumn, 10) },
-    end: { line: parseInt(endLine, 10), column: parseInt(endColumn, 10) },
-  };
-}
-
-function writeJSON(message) {
-  process.stdout.write(JSON.stringify(message));
-}
-
-function createMessageFromError({ name, message }) {
-  const status = 'error';
-  switch (name) {
-    case 'ExpressionNotFound': {
-      return { status, error: { name, message } };
-    }
-    case 'SyntaxError': {
-      return { status, error: { name, message: 'Unable to parse the code' } };
-    }
-    default: {
-      return { status, error: { name, message } };
-    }
-  }
-}
-
-async function extractVariableCmd(selection) {
-  const file = await getStdin();
-  try {
-    const code = extractVariable(file, selection);
-    writeJSON({ status: 'ok', code });
-  } catch (error) {
-    writeJSON(createMessageFromError(error));
-  }
-}
+import chunk from 'lodash/chunk';
+import { AstExplorer, Position } from '../lib/main';
 
 (() => {
-  async function getExpressionsCmd(selection, options) {
+  function writeJSON(message) {
+    process.stdout.write(JSON.stringify(message));
+  }
+
+  function createMessageFromError({ name, message }) {
+    const status = 'error';
+    switch (name) {
+      case 'ExpressionNotFound': {
+        return { status, error: { name, message } };
+      }
+      case 'SyntaxError': {
+        return { status, error: { name, message: 'Unable to parse the code' } };
+      }
+      default: {
+        return { status, error: { name, message } };
+      }
+    }
+  }
+
+  async function extractVariableCmd(selections) {
     const file = await getStdin();
     try {
-      const expressions = findExpressions(file, selection, options);
+      const astExplorer = new AstExplorer(file);
+      let code;
+      if (selections.length === 1) {
+        code = astExplorer.extractVariable(selections[0]);
+      } else {
+        code = astExplorer.extractMultipleVariables(selections);
+      }
+      writeJSON({ status: 'ok', code });
+    } catch (error) {
+      writeJSON(createMessageFromError(error));
+    }
+  }
+
+  async function getExpressionsCmd(selection) {
+    const file = await getStdin();
+    try {
+      const astExplorer = new AstExplorer(file);
+      const expressions = astExplorer.findExpressions(selection);
+      writeJSON({ status: 'ok', expressions });
+    } catch (error) {
+      writeJSON(createMessageFromError(error));
+    }
+  }
+
+  async function getExpressionOccurrencesCmd(selection) {
+    const file = await getStdin();
+    try {
+      const astExplorer = new AstExplorer(file);
+      const expressions = astExplorer.findExpressionOccurrences(selection);
       writeJSON({ status: 'ok', expressions });
     } catch (error) {
       writeJSON(createMessageFromError(error));
@@ -53,25 +65,29 @@ async function extractVariableCmd(selection) {
   }
 
   program
-    .command('get-expressions <startLine> <startColumn> <endLine> <endColumn>')
-    .option('-d, --depth [depth]', 'set the depth the expressions should be looked for')
-    .option('-e, --exact [exact]', 'should it search for expressions in exact passed selection')
+    .command('get-expressions <startPosition> <endPosition>')
     .description('get expressions at range')
-    .action((startLine, startColumn, endLine, endColumn, { depth, exact }) => {
-      const options = {
-        depth: depth ? parseInt(depth, 10) : 0,
-        exact: exact === 'true',
-      };
-      const selection = createSelection(startLine, startColumn, endLine, endColumn);
-      getExpressionsCmd(selection, options);
+    .action((startPosition, endPosition) => {
+      const selection = new Position(parseInt(startPosition, 10), parseInt(endPosition, 10));
+      getExpressionsCmd(selection);
     });
 
   program
-    .command('extract-variable <startLine> <startColumn> <endLine> <endColumn>')
+    .command('extract-variable [positions...]')
     .description('extract variable at range')
-    .action((startLine, startColumn, endLine, endColumn) => {
-      const selection = createSelection(startLine, startColumn, endLine, endColumn);
-      extractVariableCmd(selection);
+    .action((positions) => {
+      const intPositions = positions.map(position => parseInt(position, 10));
+      const positionPairs = chunk(intPositions, 2);
+      const selections = positionPairs.map(([start, end]) => new Position(start, end));
+      extractVariableCmd(selections);
+    });
+
+  program
+    .command('get-expression-occurrences <startPosition> <endPosition>')
+    .description('get all expressions of the same value at the same scope')
+    .action((startPosition, endPosition) => {
+      const selection = new Position(parseInt(startPosition, 10), parseInt(endPosition, 10));
+      getExpressionOccurrencesCmd(selection);
     });
 
   program.version('0.0.1').parse(process.argv);

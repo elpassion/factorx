@@ -1,37 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`extractVariable correctly extracts variable 1`] = `
-"const _ref = 5
+exports[`extractVariable with correct selection returns correct code 1`] = `
+"var _ref = 5;
 _ref + 2"
 `;
 
-exports[`extractVariable correctly extracts variable 2`] = `
-"const _ref = 5 + 2
-_ref"
-`;
-
-exports[`extractVariable correctly extracts variable 3`] = `
-"const _ref = 2
+exports[`extractVariable with correct selection returns correct code 2`] = `
+"var _ref = 2;
 5 + _ref"
 `;
 
-exports[`extractVariable correctly extracts variable 4`] = `
+exports[`extractVariable with correct selection returns correct code 3`] = `
+"var _ref = 5 + 2;
+_ref"
+`;
+
+exports[`extractVariable with correct selection returns correct code 4`] = `
 "() => {
-  const _ref = 5
-  _ref + 5
+  var _ref = 5;
+  _ref + 2
 }"
 `;
 
-exports[`extractVariable correctly extracts variable 5`] = `
-"() => {
-  const _ref = 5
-  5 + _ref
-}"
-`;
-
-exports[`extractVariable correctly extracts variable 6`] = `
-"() => {
-  const _ref = 5 + 5
-  _ref
-}"
+exports[`extractVariable with multiple selections with correct selection returns correct code 1`] = `
+"var _ref = 5;
+_ref + _ref"
 `;

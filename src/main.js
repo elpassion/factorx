@@ -1,6 +1,7 @@
 // @flow
 
-import { findExpressions, ExpressionNotFoundError } from './findExpressions';
-import { extractVariable } from './extractVariable';
+import ExpressionNotFoundError from './ExpressionNotFoundError';
+import AstExplorer from './AstExplorer';
+import Position from './Position';
 
-export { findExpressions, extractVariable, ExpressionNotFoundError };
+export { AstExplorer, ExpressionNotFoundError, Position };

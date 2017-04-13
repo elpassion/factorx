@@ -5,6 +5,7 @@
   ],
   "plugins": [
     "transform-flow-strip-types",
-    "syntax-flow"
+    "syntax-flow",
+    "transform-class-properties"
   ]
 }

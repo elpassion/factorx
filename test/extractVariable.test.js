@@ -1,57 +1,52 @@
 // @flow
-import { extractVariable } from '../src/extractVariable';
-import { ExpressionNotFoundError } from '../src/findExpressions';
+import ExpressionNotFoundError from '../src/ExpressionNotFoundError';
+import AstExplorer from '../src/AstExplorer';
+import Position from '../src/Position';
 
 describe('extractVariable', () => {
-  const binaryExpression = '5 + 2';
-  const expressionInsideFunction = '() => {\n  5 + 5\n}';
-
-  function testExtractVariable(code, selection) {
-    expect(extractVariable(code, selection)).toMatchSnapshot();
-  }
-
-  function testExtractVariableThrows(code, selection) {
-    const extractVariableWithUnexistingExpression = () => {
-      extractVariable(code, selection);
-    };
-    expect(extractVariableWithUnexistingExpression).toThrowError(new ExpressionNotFoundError());
-  }
-
-  test('correctly extracts variable', () => {
-    testExtractVariable(binaryExpression, {
-      start: { line: 0, column: 0 },
-      end: { line: 0, column: 1 },
-    });
-    testExtractVariable(binaryExpression, {
-      start: { line: 0, column: 0 },
-      end: { line: 0, column: 5 },
-    });
-    testExtractVariable(binaryExpression, {
-      start: { line: 0, column: 4 },
-      end: { line: 0, column: 5 },
-    });
-    testExtractVariable(expressionInsideFunction, {
-      start: { line: 1, column: 2 },
-      end: { line: 1, column: 3 },
-    });
-    testExtractVariable(expressionInsideFunction, {
-      start: { line: 1, column: 6 },
-      end: { line: 1, column: 7 },
-    });
-    testExtractVariable(expressionInsideFunction, {
-      start: { line: 1, column: 2 },
-      end: { line: 1, column: 7 },
+  const expectExtractVariable = (code, start, end) => {
+    const astExplorer = new AstExplorer(code);
+    expect(astExplorer.extractVariable(new Position(start, end))).toMatchSnapshot();
+  };
+  describe('with correct selection', () => {
+    test('returns correct code', () => {
+      expectExtractVariable('5 + 2', 0, 1);
+      expectExtractVariable('5 + 2', 4, 5);
+      expectExtractVariable('5 + 2', 0, 5);
+      expectExtractVariable('() => {\n  5 + 2\n}', 10, 11);
     });
   });
 
-  test('throws when selection is not an expression', () => {
-    testExtractVariableThrows(binaryExpression, {
-      start: { line: 1, column: 4 },
-      end: { line: 0, column: 5 },
+  describe('when incorrect selection', () => {
+    test('throws an error', () => {
+      expect(() => {
+        new AstExplorer('5 + 2').extractVariable(new Position(42, 42));
+      }).toThrowError(new ExpressionNotFoundError());
     });
-    testExtractVariableThrows(binaryExpression, {
-      start: { line: 0, column: 0 },
-      end: { line: 0, column: 2 },
+  });
+
+  describe('with multiple selections', () => {
+    describe('with correct selection', () => {
+      const expectExtractMultipleVariables = (code, selections) => {
+        const positions = selections.map(selection => new Position(selection.start, selection.end));
+        const astExplorer = new AstExplorer(code);
+        expect(astExplorer.extractMultipleVariables(positions)).toMatchSnapshot();
+      };
+      test('returns correct code', () => {
+        expectExtractMultipleVariables('5 + 5', [{ start: 0, end: 1 }, { start: 4, end: 5 }]);
+      });
+    });
+
+    describe('when incorrect selection', () => {
+      test('throws an error', () => {
+        const positions = [{ start: 0, end: 1 }, { start: 42, end: 42 }].map(
+          selection => new Position(selection.start, selection.end),
+        );
+        const astExplorer = new AstExplorer('5 + 5');
+        expect(() => {
+          astExplorer.extractMultipleVariables(positions);
+        }).toThrowError(new ExpressionNotFoundError());
+      });
     });
   });
 });
