@@ -47,9 +47,9 @@
     "pre-commit": "^1.2.2"
   },
   "dependencies": {
-    "babel-core": "^6.24.1",
     "babel-generator": "^6.24.1",
     "babel-polyfill": "^6.22.0",
+    "babel-traverse": "^6.24.1",
     "babel-types": "^6.24.1",
     "babylon": "^6.16.1",
     "commander": "^2.9.0",

@@ -1,20 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`findExpressionOccurrences works with arrays 1`] = `
+exports[`findExpressionOccurrences returns only current array 1`] = `
 Array [
   Expression {
     "position": Position {
-      "end": 2,
-      "start": 1,
+      "end": 6,
+      "start": 0,
     },
-    "value": "5",
+    "value": "[5, 5]",
   },
+]
+`;
+
+exports[`findExpressionOccurrences returns only current object 1`] = `
+Array [
   Expression {
     "position": Position {
-      "end": 5,
-      "start": 4,
+      "end": 32,
+      "start": 18,
     },
-    "value": "5",
+    "value": "{ a: 5, b: 5 }",
   },
 ]
 `;
@@ -76,37 +81,6 @@ Array [
 ]
 `;
 
-exports[`findExpressionOccurrences works with multiple scopes 2`] = `
-Array [
-  Expression {
-    "position": Position {
-      "end": 26,
-      "start": 25,
-    },
-    "value": "3",
-  },
-]
-`;
-
-exports[`findExpressionOccurrences works with objects 1`] = `
-Array [
-  Expression {
-    "position": Position {
-      "end": 13,
-      "start": 12,
-    },
-    "value": "5",
-  },
-  Expression {
-    "position": Position {
-      "end": 19,
-      "start": 18,
-    },
-    "value": "5",
-  },
-]
-`;
-
 exports[`findExpressionOccurrences works with single occurrence 1`] = `
 Array [
   Expression {
@@ -115,6 +89,18 @@ Array [
       "start": 0,
     },
     "value": "5",
+  },
+]
+`;
+
+exports[`findExpressionOccurrences works with this 1`] = `
+Array [
+  Expression {
+    "position": Position {
+      "end": 29,
+      "start": 10,
+    },
+    "value": "{ b: 0, c: this.b }",
   },
 ]
 `;

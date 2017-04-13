@@ -1,14 +1,12 @@
 // @flow
 
-import * as babel from 'babel-core';
+import recast from 'recast';
+import traverse from 'babel-traverse';
+import * as types from 'babel-types';
 import Position from '../Position';
 import Expression from '../Expression';
 import ExpressionNotFoundError from '../ExpressionNotFoundError';
 import options from './options';
-import recast from 'recast';
-import traverse from 'babel-traverse';
-import * as types from 'babel-types';
-import * as babylon from 'babylon';
 
 export default class AstExplorer {
   code: string;
@@ -24,15 +22,15 @@ export default class AstExplorer {
 
   findExpressions(selection: Position): Array<Expression> {
     const paths = [];
-    this.transform(() => ({
-      visitor: {
+    this.transform((programPath) => {
+      programPath.traverse({
         Expression(path) {
           if (selection.includes(Position.fromNode(path.node))) {
             paths.push(path);
           }
         },
-      },
-    }));
+      });
+    });
     if (paths.length === 0) throw new ExpressionNotFoundError();
     let parentBlock = paths[paths.length - 1].scope.block;
     if (parentBlock.type === 'ArrowFunctionExpression' && paths.length !== 1) {
@@ -46,19 +44,25 @@ export default class AstExplorer {
 
   findExpressionOccurrences(selection: Position): Array<Expression> {
     const paths = [];
-    this.transform(() => ({
-      Expression(path) {
-        if (selection.includes(Position.fromNode(path.node))) {
-          path.scope.path.traverse({
-            [path.node.type](expressionPath) {
-              if (expressionPath.node.extra.raw === path.node.extra.raw) {
-                paths.push(expressionPath);
-              }
-            },
-          });
-        }
-      },
-    }));
+    this.transform((programPath) => {
+      programPath.traverse({
+        Expression(path) {
+          if (selection.includes(Position.fromNode(path.node))) {
+            if (types.isObjectExpression(path) || types.isArrayExpression(path)) {
+              paths.push(path);
+              return undefined;
+            }
+            path.scope.path.traverse({
+              [path.node.type](expressionPath) {
+                if (expressionPath.node.extra.raw === path.node.extra.raw) {
+                  paths.push(expressionPath);
+                }
+              },
+            });
+          }
+        },
+      });
+    });
     if (paths.length === 0) throw new ExpressionNotFoundError();
     return paths.map(path => path.node).map(this.serializeNode);
   }
@@ -69,10 +73,10 @@ export default class AstExplorer {
       programPath.traverse({
         Expression: (path) => {
           const { node } = path;
-          if (!node.visited && selection.includes(Position.fromNode(path.node))) {
+          if (!node.visited && selection.includes(Position.fromNode(node))) {
             node.visited = true;
             const id = path.scope.generateUidIdentifierBasedOnNode(node.id);
-            path.scope.push({ id, init: path.node });
+            path.scope.push({ id, init: node });
             path.replaceWith(types.identifier(id.name));
             extracted = true;
           }
