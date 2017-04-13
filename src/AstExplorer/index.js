@@ -6,29 +6,18 @@ import Expression from '../Expression';
 import ExpressionNotFoundError from '../ExpressionNotFoundError';
 import options from './options';
 import recast from 'recast';
+import traverse from 'babel-traverse';
+import * as types from 'babel-types';
+import * as babylon from 'babylon';
 
 export default class AstExplorer {
   code: string;
   ast: Object;
   map: Object;
-  stop: Function;
 
-  constructor(input: string) {
-    // const ast = babylon.parse(input, {
-    // parser: {
-    // parse(source) {
-    // return recast.parse(source);
-    // },
-    // },
-    // });
-    const ast = recast.parse(input, options);
-    console.log(ast);
-    console.log(recast.print(ast, options, input));
-
-    // const { code, map, ast } = babel.transform(input, options);
-    // this.code = code;
-    // this.map = map;
-    // this.ast = ast;
+  constructor(code: string) {
+    this.code = code;
+    this.ast = recast.parse(code, options);
   }
 
   serializeNode = (node: Object) => Expression.fromNode(this.code, node);
@@ -38,7 +27,7 @@ export default class AstExplorer {
     this.transform(() => ({
       visitor: {
         Expression(path) {
-          if (selection.includes(path.node)) {
+          if (selection.includes(Position.fromNode(path.node))) {
             paths.push(path);
           }
         },
@@ -58,18 +47,16 @@ export default class AstExplorer {
   findExpressionOccurrences(selection: Position): Array<Expression> {
     const paths = [];
     this.transform(() => ({
-      visitor: {
-        Expression(path) {
-          if (selection.includes(path.node)) {
-            path.scope.path.traverse({
-              [path.node.type](expressionPath) {
-                if (expressionPath.node.extra.raw === path.node.extra.raw) {
-                  paths.push(expressionPath);
-                }
-              },
-            });
-          }
-        },
+      Expression(path) {
+        if (selection.includes(Position.fromNode(path.node))) {
+          path.scope.path.traverse({
+            [path.node.type](expressionPath) {
+              if (expressionPath.node.extra.raw === path.node.extra.raw) {
+                paths.push(expressionPath);
+              }
+            },
+          });
+        }
       },
     }));
     if (paths.length === 0) throw new ExpressionNotFoundError();
@@ -78,11 +65,11 @@ export default class AstExplorer {
 
   extractVariable(selection: Position): string {
     let extracted = false;
-    this.transform(({ types }) => ({
-      visitor: {
+    this.transform((programPath) => {
+      programPath.traverse({
         Expression: (path) => {
           const { node } = path;
-          if (!node.visited && selection.includes(node)) {
+          if (!node.visited && selection.includes(Position.fromNode(path.node))) {
             node.visited = true;
             const id = path.scope.generateUidIdentifierBasedOnNode(node.id);
             path.scope.push({ id, init: path.node });
@@ -90,19 +77,18 @@ export default class AstExplorer {
             extracted = true;
           }
         },
-      },
-    }));
+      });
+    });
     if (!extracted) throw new ExpressionNotFoundError();
     return this.code;
   }
 
-  transform(plugin: Function) {
-    const { code, map, ast } = babel.transformFromAst(this.ast, this.code, {
-      ...options,
-      plugins: [plugin],
+  transform(transformation: Function) {
+    traverse(this.ast, {
+      Program(programPath) {
+        transformation(programPath);
+      },
     });
-    this.code = code;
-    this.map = map;
-    this.ast = ast;
+    this.code = recast.print(this.ast).code;
   }
 }

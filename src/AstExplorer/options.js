@@ -1,5 +1,5 @@
 // @flow
-import babylon from 'recast';
+import * as babylon from 'babylon';
 
 const options = {
   parser: {

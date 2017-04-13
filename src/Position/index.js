@@ -9,19 +9,23 @@ export default class Position {
     this.end = end;
   }
 
+  static fromNode(node: Object) {
+    return new Position(node.start, node.end);
+  }
+
   isBlank() {
     return this.start === this.end;
   }
 
-  equalToPosition(otherPosition: Object) {
+  equalToPosition(otherPosition: Position) {
     return otherPosition.start === this.start && otherPosition.end === this.end;
   }
 
-  includesPosition(otherPosition: Object) {
+  includesPosition(otherPosition: Position) {
     return otherPosition.start <= this.start && otherPosition.end >= this.end;
   }
 
-  includes(otherPosition: Object) {
+  includes(otherPosition: Position) {
     return (this.isBlank() && this.includesPosition(otherPosition)) ||
       this.equalToPosition(otherPosition);
   }
