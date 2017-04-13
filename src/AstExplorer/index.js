@@ -60,11 +60,45 @@ export default class AstExplorer {
               },
             });
           }
+          return undefined;
         },
       });
     });
     if (paths.length === 0) throw new ExpressionNotFoundError();
     return paths.map(path => path.node).map(this.serializeNode);
+  }
+
+  extractMultipleVariables(selections: Array<Position>): string {
+    let replacedNodesCount = 0;
+    this.transform((programPath) => {
+      const firstSelection = selections[0];
+      programPath.traverse({
+        Expression: (path) => {
+          const { node } = path;
+          if (!node.visited && firstSelection.includes(Position.fromNode(node))) {
+            node.visited = true;
+            const id = path.scope.generateUidIdentifierBasedOnNode(node.id);
+            path.scope.push({ id, init: node });
+            path.scope.path.traverse({
+              Expression: (selectionPath) => {
+                if (
+                  selections.find(selection =>
+                    selection.includes(Position.fromNode(selectionPath.node))) &&
+                  !(selectionPath.parent &&
+                    selectionPath.parent.type === 'VariableDeclarator' &&
+                    selectionPath.parent.id === id)
+                ) {
+                  replacedNodesCount += 1;
+                  selectionPath.replaceWith(types.identifier(id.name));
+                }
+              },
+            });
+          }
+        },
+      });
+    });
+    if (replacedNodesCount !== selections.length) throw new ExpressionNotFoundError();
+    return this.code;
   }
 
   extractVariable(selection: Position): string {

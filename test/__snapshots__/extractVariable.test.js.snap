@@ -21,3 +21,8 @@ exports[`extractVariable with correct selection returns correct code 4`] = `
   _ref + 2
 }"
 `;
+
+exports[`extractVariable with multiple selections with correct selection returns correct code 1`] = `
+"var _ref = 5;
+_ref + _ref"
+`;

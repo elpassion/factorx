@@ -24,4 +24,29 @@ describe('extractVariable', () => {
       }).toThrowError(new ExpressionNotFoundError());
     });
   });
+
+  describe('with multiple selections', () => {
+    describe('with correct selection', () => {
+      const expectExtractMultipleVariables = (code, selections) => {
+        const positions = selections.map(selection => new Position(selection.start, selection.end));
+        const astExplorer = new AstExplorer(code);
+        expect(astExplorer.extractMultipleVariables(positions)).toMatchSnapshot();
+      };
+      test('returns correct code', () => {
+        expectExtractMultipleVariables('5 + 5', [{ start: 0, end: 1 }, { start: 4, end: 5 }]);
+      });
+    });
+
+    describe('when incorrect selection', () => {
+      test('throws an error', () => {
+        const positions = [{ start: 0, end: 1 }, { start: 42, end: 42 }].map(
+          selection => new Position(selection.start, selection.end),
+        );
+        const astExplorer = new AstExplorer('5 + 5');
+        expect(() => {
+          astExplorer.extractMultipleVariables(positions);
+        }).toThrowError(new ExpressionNotFoundError());
+      });
+    });
+  });
 });
