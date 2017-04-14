@@ -3,6 +3,7 @@
 import recast from 'recast';
 import traverse from 'babel-traverse';
 import * as types from 'babel-types';
+import reduceRight from 'lodash/reduceRight';
 import Position from '../Position';
 import Expression from '../Expression';
 import ExpressionNotFoundError from '../ExpressionNotFoundError';
@@ -36,10 +37,14 @@ export default class AstExplorer {
     if (parentBlock.type === 'ArrowFunctionExpression' && paths.length !== 1) {
       parentBlock = parentBlock.body;
     }
-    return paths
-      .filter(path => parentBlock.start <= path.node.start && parentBlock.end >= path.node.end)
-      .map(path => path.node)
-      .map(this.serializeNode);
+    return reduceRight(
+      paths
+        .filter(path => parentBlock.start <= path.node.start && parentBlock.end >= path.node.end)
+        .map(path => path.node)
+        .map(this.serializeNode),
+      (acc, node) => acc.concat([node]),
+      [],
+    );
   }
 
   findExpressionOccurrences(selection: Position): Array<Expression> {

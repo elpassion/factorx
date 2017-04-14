@@ -4,17 +4,17 @@ exports[`findExpressions at end of an expression returns all expressions contain
 Array [
   Expression {
     "position": Position {
-      "end": 5,
-      "start": 0,
-    },
-    "value": "5 + 2",
-  },
-  Expression {
-    "position": Position {
       "end": 1,
       "start": 0,
     },
     "value": "5",
+  },
+  Expression {
+    "position": Position {
+      "end": 5,
+      "start": 0,
+    },
+    "value": "5 + 2",
   },
 ]
 `;
@@ -36,16 +36,16 @@ Array [
   Expression {
     "position": Position {
       "end": 5,
-      "start": 0,
+      "start": 4,
     },
-    "value": "5 + 2",
+    "value": "2",
   },
   Expression {
     "position": Position {
       "end": 5,
-      "start": 4,
+      "start": 0,
     },
-    "value": "2",
+    "value": "5 + 2",
   },
 ]
 `;
@@ -54,17 +54,17 @@ exports[`findExpressions at start of an expression returns all expressions conta
 Array [
   Expression {
     "position": Position {
-      "end": 5,
-      "start": 0,
-    },
-    "value": "5 + 2",
-  },
-  Expression {
-    "position": Position {
       "end": 1,
       "start": 0,
     },
     "value": "5",
+  },
+  Expression {
+    "position": Position {
+      "end": 5,
+      "start": 0,
+    },
+    "value": "5 + 2",
   },
 ]
 `;
@@ -86,16 +86,16 @@ Array [
   Expression {
     "position": Position {
       "end": 5,
-      "start": 0,
+      "start": 4,
     },
-    "value": "5 + 2",
+    "value": "2",
   },
   Expression {
     "position": Position {
       "end": 5,
-      "start": 4,
+      "start": 0,
     },
-    "value": "2",
+    "value": "5 + 2",
   },
 ]
 `;
@@ -104,17 +104,17 @@ exports[`findExpressions at start of an expression returns all expressions conta
 Array [
   Expression {
     "position": Position {
-      "end": 13,
-      "start": 8,
-    },
-    "value": "5 + 2",
-  },
-  Expression {
-    "position": Position {
       "end": 9,
       "start": 8,
     },
     "value": "5",
+  },
+  Expression {
+    "position": Position {
+      "end": 13,
+      "start": 8,
+    },
+    "value": "5 + 2",
   },
 ]
 `;
@@ -136,16 +136,16 @@ Array [
   Expression {
     "position": Position {
       "end": 13,
-      "start": 8,
+      "start": 12,
     },
-    "value": "5 + 2",
+    "value": "2",
   },
   Expression {
     "position": Position {
       "end": 13,
-      "start": 12,
+      "start": 8,
     },
-    "value": "2",
+    "value": "5 + 2",
   },
 ]
 `;
@@ -154,17 +154,17 @@ exports[`findExpressions at start of an expression returns all expressions conta
 Array [
   Expression {
     "position": Position {
-      "end": 37,
-      "start": 32,
-    },
-    "value": "2 + 2",
-  },
-  Expression {
-    "position": Position {
       "end": 33,
       "start": 32,
     },
     "value": "2",
+  },
+  Expression {
+    "position": Position {
+      "end": 37,
+      "start": 32,
+    },
+    "value": "2 + 2",
   },
 ]
 `;
@@ -173,17 +173,17 @@ exports[`findExpressions at start of an expression returns all expressions conta
 Array [
   Expression {
     "position": Position {
-      "end": 16,
-      "start": 11,
-    },
-    "value": "5 > 3",
-  },
-  Expression {
-    "position": Position {
       "end": 12,
       "start": 11,
     },
     "value": "5",
+  },
+  Expression {
+    "position": Position {
+      "end": 16,
+      "start": 11,
+    },
+    "value": "5 > 3",
   },
 ]
 `;
