@@ -3,6 +3,8 @@
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 require('babel-polyfill');
 
 var _commander = require('commander');
@@ -26,7 +28,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 (function () {
   var extractVariableCmd = function () {
     var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee(selections) {
-      var file, astExplorer, code;
+      var file, astExplorer, result;
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -39,14 +41,14 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
               try {
                 astExplorer = new _main.AstExplorer(file);
-                code = void 0;
+                result = void 0;
 
                 if (selections.length === 1) {
-                  code = astExplorer.extractVariable(selections[0]);
+                  result = astExplorer.extractVariable(selections[0]);
                 } else {
-                  code = astExplorer.extractMultipleVariables(selections);
+                  result = astExplorer.extractMultipleVariables(selections);
                 }
-                writeJSON({ status: 'ok', code: code });
+                writeJSON(_extends({ status: 'ok' }, result));
               } catch (error) {
                 writeJSON(createMessageFromError(error));
               }

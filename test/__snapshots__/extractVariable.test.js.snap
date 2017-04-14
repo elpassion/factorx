@@ -1,28 +1,58 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`extractVariable with correct selection returns correct code 1`] = `
-"var _ref = 5;
-_ref + 2"
+Object {
+  "code": "var _ref = 5;
+_ref + 2",
+  "identifierPosition": Position {
+    "end": 8,
+    "start": 4,
+  },
+}
 `;
 
 exports[`extractVariable with correct selection returns correct code 2`] = `
-"var _ref = 2;
-5 + _ref"
+Object {
+  "code": "var _ref = 2;
+5 + _ref",
+  "identifierPosition": Position {
+    "end": 8,
+    "start": 4,
+  },
+}
 `;
 
 exports[`extractVariable with correct selection returns correct code 3`] = `
-"var _ref = 5 + 2;
-_ref"
+Object {
+  "code": "var _ref = 5 + 2;
+_ref",
+  "identifierPosition": Position {
+    "end": 8,
+    "start": 4,
+  },
+}
 `;
 
 exports[`extractVariable with correct selection returns correct code 4`] = `
-"() => {
+Object {
+  "code": "() => {
   var _ref = 5;
   _ref + 2
-}"
+}",
+  "identifierPosition": Position {
+    "end": 18,
+    "start": 14,
+  },
+}
 `;
 
 exports[`extractVariable with multiple selections with correct selection returns correct code 1`] = `
-"var _ref = 5;
-_ref + _ref"
+Object {
+  "code": "var _ref = 5;
+_ref + _ref",
+  "identifierPosition": Position {
+    "end": 8,
+    "start": 4,
+  },
+}
 `;
