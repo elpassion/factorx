@@ -39,6 +39,12 @@ describe('findExpressionOccurrences', () => {
     expect(astExplorer.findExpressionOccurrences(new Position(1, 2))).toMatchSnapshot();
   });
 
+  it('works in correct order', () => {
+    const code = '[5, 5]';
+    const astExplorer = new AstExplorer(code);
+    expect(astExplorer.findExpressionOccurrences(new Position(4, 5))).toMatchSnapshot();
+  });
+
   it('returns only current object', () => {
     const code = '() => { const a = { a: 5, b: 5 }; const b = { a: 5, b: 5 }; }';
     const astExplorer = new AstExplorer(code);
