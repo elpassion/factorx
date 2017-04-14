@@ -3,7 +3,7 @@
 import recast from 'recast';
 import traverse from 'babel-traverse';
 import * as types from 'babel-types';
-import reduceRight from 'lodash/reduceRight';
+import { rotateArray } from '../helpers';
 import Position from '../Position';
 import Expression from '../Expression';
 import ExpressionNotFoundError from '../ExpressionNotFoundError';
@@ -37,13 +37,11 @@ export default class AstExplorer {
     if (parentBlock.type === 'ArrowFunctionExpression' && paths.length !== 1) {
       parentBlock = parentBlock.body;
     }
-    return reduceRight(
+    return rotateArray(
       paths
         .filter(path => parentBlock.start <= path.node.start && parentBlock.end >= path.node.end)
         .map(path => path.node)
         .map(this.serializeNode),
-      (acc, node) => acc.concat([node]),
-      [],
     );
   }
 
@@ -78,8 +76,14 @@ export default class AstExplorer {
     return paths.map(path => path.node).map(this.serializeNode);
   }
 
-  extractMultipleVariables(selections: Array<Position>): string {
+  extractMultipleVariables(
+    selections: Array<Position>,
+  ): { code: string, identifierPosition: Position | typeof undefined } {
     let replacedNodesCount = 0;
+    const road = [];
+    let identifierPosition;
+    let identifier;
+
     this.transform((programPath) => {
       const firstSelection = selections[0];
       programPath.traverse({
@@ -87,8 +91,14 @@ export default class AstExplorer {
           const { node } = path;
           if (!node.visited && firstSelection.includes(Position.fromNode(node))) {
             node.visited = true;
-            const id = path.scope.generateUidIdentifierBasedOnNode(node.id);
-            path.scope.push({ id, init: node });
+            identifier = path.scope.generateUidIdentifierBasedOnNode(node.id);
+            path.scope.push({ id: identifier, init: node });
+            let roadPath = path.scope.path;
+            road.push(roadPath.key);
+            while (roadPath.key !== 'program') {
+              roadPath = roadPath.parentPath;
+              road.push(roadPath.key);
+            }
             path.scope.path.traverse({
               Expression: (selectionPath) => {
                 if (
@@ -96,10 +106,10 @@ export default class AstExplorer {
                     selection.includes(Position.fromNode(selectionPath.node))) &&
                   !(selectionPath.parent &&
                     selectionPath.parent.type === 'VariableDeclarator' &&
-                    selectionPath.parent.id === id)
+                    selectionPath.parent.id === identifier)
                 ) {
                   replacedNodesCount += 1;
-                  selectionPath.replaceWith(types.identifier(id.name));
+                  selectionPath.replaceWith(types.identifier(identifier.name));
                 }
               },
             });
@@ -108,27 +118,65 @@ export default class AstExplorer {
       });
     });
     if (replacedNodesCount !== selections.length) throw new ExpressionNotFoundError();
-    return this.code;
+
+    this.transform((programPath) => {
+      let scope;
+      if (road[0] === 'program') {
+        scope = programPath.scope;
+      } else {
+        const roadPath = rotateArray(road.slice(0, -1).concat(['body'])).join('.');
+        scope = programPath.get(roadPath).scope;
+      }
+      identifierPosition = Position.fromNode(scope.bindings[identifier.name].path.node.id);
+    });
+
+    return { code: this.code, identifierPosition };
   }
 
-  extractVariable(selection: Position): string {
+  extractVariable(
+    selection: Position,
+  ): { code: string, identifierPosition: Position | typeof undefined } {
     let extracted = false;
+    const road = [];
+    let identifierPosition;
+    let identifier;
+
     this.transform((programPath) => {
       programPath.traverse({
         Expression: (path) => {
           const { node } = path;
           if (!node.visited && selection.includes(Position.fromNode(node))) {
             node.visited = true;
-            const id = path.scope.generateUidIdentifierBasedOnNode(node.id);
-            path.scope.push({ id, init: node });
-            path.replaceWith(types.identifier(id.name));
+            identifier = path.scope.generateUidIdentifierBasedOnNode(node.id);
+            path.scope.push({ id: identifier, init: node });
+            path.replaceWith(types.identifier(identifier.name));
             extracted = true;
+            let roadPath = path.scope.path;
+            road.push(roadPath.key);
+            while (roadPath.key !== 'program') {
+              roadPath = roadPath.parentPath;
+              road.push(roadPath.key);
+            }
           }
         },
       });
     });
+
     if (!extracted) throw new ExpressionNotFoundError();
-    return this.code;
+
+    this.transform((programPath) => {
+      let scope;
+      if (road[0] === 'program') {
+        scope = programPath.scope;
+      } else {
+        const roadPath = rotateArray(road.slice(0, -1).concat(['body'])).join('.');
+        scope = programPath.get(roadPath).scope;
+      }
+      identifierPosition = Position.fromNode(scope.bindings[identifier.name].path.node.id);
+    });
+
+    // console.log({ code: this.code, identifierPosition });
+    return { code: this.code, identifierPosition };
   }
 
   transform(transformation: Function) {
@@ -138,5 +186,6 @@ export default class AstExplorer {
       },
     });
     this.code = recast.print(this.ast).code;
+    this.ast = recast.parse(this.code, options);
   }
 }
