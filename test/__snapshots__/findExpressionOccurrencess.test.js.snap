@@ -24,6 +24,25 @@ Array [
 ]
 `;
 
+exports[`findExpressionOccurrences works in correct order 1`] = `
+Array [
+  Expression {
+    "position": Position {
+      "end": 5,
+      "start": 4,
+    },
+    "value": "5",
+  },
+  Expression {
+    "position": Position {
+      "end": 2,
+      "start": 1,
+    },
+    "value": "5",
+  },
+]
+`;
+
 exports[`findExpressionOccurrences works with multiple occurrences 1`] = `
 Array [
   Expression {
