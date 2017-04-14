@@ -43,6 +43,25 @@ Array [
 ]
 `;
 
+exports[`findExpressionOccurrences works with multiple occurrences of new 1`] = `
+Array [
+  Expression {
+    "position": Position {
+      "end": 17,
+      "start": 10,
+    },
+    "value": "new A()",
+  },
+  Expression {
+    "position": Position {
+      "end": 36,
+      "start": 29,
+    },
+    "value": "new A()",
+  },
+]
+`;
+
 exports[`findExpressionOccurrences works with multiple occurrences of strings 1`] = `
 Array [
   Expression {

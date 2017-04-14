@@ -48,17 +48,18 @@ export default class AstExplorer {
       programPath.traverse({
         Expression(path) {
           if (selection.includes(Position.fromNode(path.node))) {
-            if (types.isObjectExpression(path) || types.isArrayExpression(path)) {
+            if (path.node.extra) {
+              path.scope.path.traverse({
+                [path.node.type](expressionPath) {
+                  if (expressionPath.node.extra.raw === path.node.extra.raw) {
+                    paths.push(expressionPath);
+                  }
+                },
+              });
+            } else {
               paths.push(path);
               return undefined;
             }
-            path.scope.path.traverse({
-              [path.node.type](expressionPath) {
-                if (expressionPath.node.extra.raw === path.node.extra.raw) {
-                  paths.push(expressionPath);
-                }
-              },
-            });
           }
           return undefined;
         },
