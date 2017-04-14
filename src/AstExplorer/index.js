@@ -53,20 +53,16 @@ export default class AstExplorer {
           const nodePosition = Position.fromNode(path.node);
           if (selection.includes(nodePosition)) {
             paths.push(path);
-            if (path.node.extra) {
-              path.scope.path.traverse({
-                [path.node.type](expressionPath) {
-                  if (
-                    !nodePosition.includes(Position.fromNode(expressionPath.node)) &&
-                    expressionPath.node.extra.raw === path.node.extra.raw
-                  ) {
-                    paths.push(expressionPath);
-                  }
-                },
-              });
-            } else {
-              return undefined;
-            }
+            path.scope.path.traverse({
+              [path.node.type](expressionPath) {
+                if (
+                  !nodePosition.includes(Position.fromNode(expressionPath.node)) &&
+                  types.isNodesEquivalent(expressionPath.node, path.node)
+                ) {
+                  paths.push(expressionPath);
+                }
+              },
+            });
           }
           return undefined;
         },
