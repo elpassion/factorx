@@ -1,29 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`findExpressionOccurrences returns only current array 1`] = `
-Array [
-  Expression {
-    "position": Position {
-      "end": 6,
-      "start": 0,
-    },
-    "value": "[5, 5]",
-  },
-]
-`;
-
-exports[`findExpressionOccurrences returns only current object 1`] = `
-Array [
-  Expression {
-    "position": Position {
-      "end": 32,
-      "start": 18,
-    },
-    "value": "{ a: 5, b: 5 }",
-  },
-]
-`;
-
 exports[`findExpressionOccurrences works in correct order 1`] = `
 Array [
   Expression {
@@ -39,6 +15,44 @@ Array [
       "start": 1,
     },
     "value": "5",
+  },
+]
+`;
+
+exports[`findExpressionOccurrences works with multiple arrays 1`] = `
+Array [
+  Expression {
+    "position": Position {
+      "end": 6,
+      "start": 0,
+    },
+    "value": "[5, 5]",
+  },
+  Expression {
+    "position": Position {
+      "end": 14,
+      "start": 8,
+    },
+    "value": "[5, 5]",
+  },
+]
+`;
+
+exports[`findExpressionOccurrences works with multiple objects 1`] = `
+Array [
+  Expression {
+    "position": Position {
+      "end": 32,
+      "start": 18,
+    },
+    "value": "{ a: 5, b: 5 }",
+  },
+  Expression {
+    "position": Position {
+      "end": 58,
+      "start": 44,
+    },
+    "value": "{ a: 5, b: 5 }",
   },
 ]
 `;

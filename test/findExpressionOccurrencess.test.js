@@ -21,7 +21,7 @@ describe('findExpressionOccurrences', () => {
     expect(astExplorer.findExpressionOccurrences(new Position(0, 5))).toMatchSnapshot();
   });
 
-  xit('works with multiple occurrences of new', () => {
+  it('works with multiple occurrences of new', () => {
     const code = 'const a = new A();\nconst b = new A();';
     const astExplorer = new AstExplorer(code);
     expect(astExplorer.findExpressionOccurrences(new Position(10, 10))).toMatchSnapshot();
@@ -45,13 +45,13 @@ describe('findExpressionOccurrences', () => {
     expect(astExplorer.findExpressionOccurrences(new Position(4, 5))).toMatchSnapshot();
   });
 
-  it('returns only current object', () => {
+  it('works with multiple objects', () => {
     const code = '() => { const a = { a: 5, b: 5 }; const b = { a: 5, b: 5 }; }';
     const astExplorer = new AstExplorer(code);
     expect(astExplorer.findExpressionOccurrences(new Position(18, 32))).toMatchSnapshot();
   });
 
-  it('returns only current array', () => {
+  it('works with multiple arrays', () => {
     const code = '[5, 5]; [5, 5]';
     const astExplorer = new AstExplorer(code);
     expect(astExplorer.findExpressionOccurrences(new Position(0, 6))).toMatchSnapshot();
