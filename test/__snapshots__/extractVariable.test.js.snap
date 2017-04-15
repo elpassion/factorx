@@ -2,7 +2,7 @@
 
 exports[`extractVariable with correct selection returns correct code 1`] = `
 Object {
-  "code": "var _ref = 5;
+  "code": "let _ref = 5;
 _ref + 2",
   "identifierPosition": Position {
     "end": 8,
@@ -13,7 +13,7 @@ _ref + 2",
 
 exports[`extractVariable with correct selection returns correct code 2`] = `
 Object {
-  "code": "var _ref = 2;
+  "code": "let _ref = 2;
 5 + _ref",
   "identifierPosition": Position {
     "end": 8,
@@ -24,7 +24,7 @@ Object {
 
 exports[`extractVariable with correct selection returns correct code 3`] = `
 Object {
-  "code": "var _ref = 5 + 2;
+  "code": "let _ref = 5 + 2;
 _ref",
   "identifierPosition": Position {
     "end": 8,
@@ -36,12 +36,36 @@ _ref",
 exports[`extractVariable with correct selection returns correct code 4`] = `
 Object {
   "code": "() => {
-  var _ref = 5;
+  let _ref = 5;
   _ref + 2
 }",
   "identifierPosition": Position {
     "end": 18,
     "start": 14,
+  },
+}
+`;
+
+exports[`extractVariable with correct selection returns correct code 5`] = `
+Object {
+  "code": "let a = do {
+  let _ref = 5;
+  _ref + 2
+}",
+  "identifierPosition": Position {
+    "end": 23,
+    "start": 19,
+  },
+}
+`;
+
+exports[`extractVariable with correct selection returns correct code 6`] = `
+Object {
+  "code": "let _ref = 5;
+import a from \\"b\\";_ref;",
+  "identifierPosition": Position {
+    "end": 8,
+    "start": 4,
   },
 }
 `;

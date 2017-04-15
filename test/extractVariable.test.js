@@ -14,6 +14,8 @@ describe('extractVariable', () => {
       expectExtractVariable('5 + 2', 4, 5);
       expectExtractVariable('5 + 2', 0, 5);
       expectExtractVariable('() => {\n  5 + 2\n}', 10, 11);
+      expectExtractVariable('let a = do { 5 + 2 }', 13, 14);
+      expectExtractVariable('import a from "b";5;', 18, 19);
     });
   });
 
