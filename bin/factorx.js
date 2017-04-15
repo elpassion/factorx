@@ -101,9 +101,9 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
     };
   }();
 
-  var getExpressionOccurrencesCmd = function () {
-    var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(selection) {
-      var file, astExplorer, expressions;
+  var renameIdentifierCmd = function () {
+    var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(selection, newName) {
+      var file, astExplorer, result;
       return regeneratorRuntime.wrap(function _callee3$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
@@ -116,9 +116,9 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
               try {
                 astExplorer = new _main.AstExplorer(file);
-                expressions = astExplorer.findExpressionOccurrences(selection);
+                result = astExplorer.renameIdentifier(selection, newName);
 
-                writeJSON({ status: 'ok', expressions: expressions });
+                writeJSON(_extends({ status: 'ok' }, result));
               } catch (error) {
                 writeJSON(createMessageFromError(error));
               }
@@ -131,8 +131,43 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
       }, _callee3, this);
     }));
 
-    return function getExpressionOccurrencesCmd(_x4) {
+    return function renameIdentifierCmd(_x4, _x5) {
       return _ref4.apply(this, arguments);
+    };
+  }();
+
+  var getExpressionOccurrencesCmd = function () {
+    var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(selection) {
+      var file, astExplorer, expressions;
+      return regeneratorRuntime.wrap(function _callee4$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              _context4.next = 2;
+              return (0, _getStdin2.default)();
+
+            case 2:
+              file = _context4.sent;
+
+              try {
+                astExplorer = new _main.AstExplorer(file);
+                expressions = astExplorer.findExpressionOccurrences(selection);
+
+                writeJSON({ status: 'ok', expressions: expressions });
+              } catch (error) {
+                writeJSON(createMessageFromError(error));
+              }
+
+            case 4:
+            case 'end':
+              return _context4.stop();
+          }
+        }
+      }, _callee4, this);
+    }));
+
+    return function getExpressionOccurrencesCmd(_x6) {
+      return _ref5.apply(this, arguments);
     };
   }();
 
@@ -147,6 +182,10 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
     var status = 'error';
     switch (name) {
       case 'ExpressionNotFound':
+        {
+          return { status: status, error: { name: name, message: message } };
+        }
+      case 'IdentifierNotFound':
         {
           return { status: status, error: { name: name, message: message } };
         }
@@ -171,10 +210,10 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
       return parseInt(position, 10);
     });
     var positionPairs = (0, _chunk2.default)(intPositions, 2);
-    var selections = positionPairs.map(function (_ref5) {
-      var _ref6 = _slicedToArray(_ref5, 2),
-          start = _ref6[0],
-          end = _ref6[1];
+    var selections = positionPairs.map(function (_ref6) {
+      var _ref7 = _slicedToArray(_ref6, 2),
+          start = _ref7[0],
+          end = _ref7[1];
 
       return new _main.Position(start, end);
     });
@@ -186,14 +225,19 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
       return parseInt(position, 10);
     });
     var positionPairs = (0, _chunk2.default)(intPositions, 2);
-    var selections = positionPairs.map(function (_ref7) {
-      var _ref8 = _slicedToArray(_ref7, 2),
-          start = _ref8[0],
-          end = _ref8[1];
+    var selections = positionPairs.map(function (_ref8) {
+      var _ref9 = _slicedToArray(_ref8, 2),
+          start = _ref9[0],
+          end = _ref9[1];
 
       return new _main.Position(start, end);
     });
     extractVariableCmd(selections, { type: 'const' });
+  });
+
+  _commander2.default.command('rename-identifier <startPosition> <endPosition> <newName>').description('extract constant at range').action(function (startPosition, endPosition, newName) {
+    var selection = new _main.Position(parseInt(startPosition, 10), parseInt(endPosition, 10));
+    renameIdentifierCmd(selection, newName);
   });
 
   _commander2.default.command('get-expression-occurrences <startPosition> <endPosition>').description('get all expressions of the same value at the same scope').action(function (startPosition, endPosition) {
