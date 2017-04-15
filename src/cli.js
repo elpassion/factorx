@@ -17,6 +17,9 @@ import { AstExplorer, Position } from '../lib/main';
       case 'ExpressionNotFound': {
         return { status, error: { name, message } };
       }
+      case 'IdentifierNotFound': {
+        return { status, error: { name, message } };
+      }
       case 'SyntaxError': {
         return { status, error: { name, message: 'Unable to parse the code' } };
       }
@@ -48,6 +51,17 @@ import { AstExplorer, Position } from '../lib/main';
       const astExplorer = new AstExplorer(file);
       const expressions = astExplorer.findExpressions(selection);
       writeJSON({ status: 'ok', expressions });
+    } catch (error) {
+      writeJSON(createMessageFromError(error));
+    }
+  }
+
+  async function renameIdentifierCmd(selection, newName) {
+    const file = await getStdin();
+    try {
+      const astExplorer = new AstExplorer(file);
+      const result = astExplorer.renameIdentifier(selection, newName);
+      writeJSON({ status: 'ok', ...result });
     } catch (error) {
       writeJSON(createMessageFromError(error));
     }
@@ -90,6 +104,14 @@ import { AstExplorer, Position } from '../lib/main';
       const positionPairs = chunk(intPositions, 2);
       const selections = positionPairs.map(([start, end]) => new Position(start, end));
       extractVariableCmd(selections, { type: 'const' });
+    });
+
+  program
+    .command('rename-identifier <startPosition> <endPosition> <newName>')
+    .description('extract constant at range')
+    .action((startPosition, endPosition, newName) => {
+      const selection = new Position(parseInt(startPosition, 10), parseInt(endPosition, 10));
+      renameIdentifierCmd(selection, newName);
     });
 
   program

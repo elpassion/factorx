@@ -7,6 +7,7 @@ import { rotateArray } from '../helpers';
 import Position from '../Position';
 import Expression from '../Expression';
 import ExpressionNotFoundError from '../ExpressionNotFoundError';
+import IdentifierNotFoundError from '../IdentifierNotFoundError';
 import options from './options';
 
 export default class AstExplorer {
@@ -75,10 +76,10 @@ export default class AstExplorer {
   extractMultipleVariables(
     selections: Array<Position>,
     variableOptions: { type: 'const' | 'let' } = { type: 'let' },
-  ): { code: string, identifierPosition: Position | typeof undefined } {
+  ): { code: string, cursorPosition: Position | typeof undefined } {
     let replacedNodesCount = 0;
     const road = [];
-    let identifierPosition;
+    let cursorPosition;
     let identifier;
 
     this.transform((programPath) => {
@@ -124,19 +125,19 @@ export default class AstExplorer {
         const roadPath = rotateArray(road.slice(0, -1).concat(['body'])).join('.');
         scope = programPath.get(roadPath).scope;
       }
-      identifierPosition = Position.fromNode(scope.bindings[identifier.name].path.node.id);
+      cursorPosition = Position.fromNode(scope.bindings[identifier.name].path.node.id);
     });
 
-    return { code: this.code, identifierPosition };
+    return { code: this.code, cursorPosition };
   }
 
   extractVariable(
     selection: Position,
     variableOptions: { type: 'const' | 'let' } = { type: 'let' },
-  ): { code: string, identifierPosition: Position | typeof undefined } {
+  ): { code: string, cursorPosition: Position | typeof undefined } {
     let extracted = false;
     const road = [];
-    let identifierPosition;
+    let cursorPosition;
     let identifier;
 
     this.transform((programPath) => {
@@ -171,10 +172,30 @@ export default class AstExplorer {
         const roadPath = rotateArray(road.slice(0, -1).concat(['body'])).join('.');
         scope = programPath.get(roadPath).scope;
       }
-      identifierPosition = Position.fromNode(scope.bindings[identifier.name].path.node.id);
+      cursorPosition = Position.fromNode(scope.bindings[identifier.name].path.node.id);
     });
 
-    return { code: this.code, identifierPosition };
+    return { code: this.code, cursorPosition };
+  }
+
+  renameIdentifier(selection: Position, newName: string) {
+    let cursorPosition;
+    let renamed = false;
+    this.transform((programPath) => {
+      programPath.traverse({
+        Identifier(path) {
+          const { node } = path;
+          if (selection.includes(Position.fromNode(node))) {
+            path.scope.rename(node.name, newName);
+            const newNodeEnd = node.start + newName.length;
+            cursorPosition = new Position(newNodeEnd, newNodeEnd);
+            renamed = true;
+          }
+        },
+      });
+    });
+    if (!renamed) throw new IdentifierNotFoundError();
+    return { code: this.code, cursorPosition };
   }
 
   transform(transformation: Function) {
