@@ -115,7 +115,29 @@ export default class AstExplorer {
         },
       });
     });
+
     if (replacedNodesCount !== selections.length) throw new ExpressionNotFoundError();
+
+    this.transform((programPath) => {
+      let scope;
+      if (road[0] === 'program') {
+        scope = programPath.scope;
+      } else {
+        const roadPath = rotateArray(road.slice(0, -1).concat(['body'])).join('.');
+        scope = programPath.get(roadPath).scope;
+      }
+      // console.log(scope.bindings);
+      const declarator = scope.bindings[identifier.name];
+      const declaratorPath = declarator.path;
+      const declarationPath = declaratorPath.parentPath;
+      const firstReferencePath = declarator.referencePaths[0];
+      const firstReferencePathParentStatement = firstReferencePath.find(
+        path =>
+          types.isStatement(path) && types.isNodesEquivalent(path.scope.path.node, scope.path.node),
+      );
+      firstReferencePathParentStatement.insertBefore(types.clone(declarationPath.node));
+      declarationPath.remove();
+    });
 
     this.transform((programPath) => {
       let scope;
@@ -163,6 +185,23 @@ export default class AstExplorer {
     });
 
     if (!extracted) throw new ExpressionNotFoundError();
+
+    this.transform((programPath) => {
+      let scope;
+      if (road[0] === 'program') {
+        scope = programPath.scope;
+      } else {
+        const roadPath = rotateArray(road.slice(0, -1).concat(['body'])).join('.');
+        scope = programPath.get(roadPath).scope;
+      }
+      const declarator = scope.bindings[identifier.name];
+      const declaratorPath = declarator.path;
+      const declarationPath = declaratorPath.parentPath;
+      const firstReferencePath = declarator.referencePaths[0];
+      const firstReferencePathParentStatement = firstReferencePath.getStatementParent();
+      firstReferencePathParentStatement.insertBefore(types.clone(declarationPath.node));
+      declarationPath.remove();
+    });
 
     this.transform((programPath) => {
       let scope;
