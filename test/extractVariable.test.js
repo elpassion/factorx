@@ -23,7 +23,16 @@ describe('extractVariable', () => {
       expectExtractVariable('5 + 2', 0, 5);
       expectExtractVariable('() => {\n  5 + 2\n}', 10, 11);
       expectExtractVariable('let a = do { 5 + 2 }', 13, 14);
-      expectExtractVariable('import a from "b";5;', 18, 19);
+      expectExtractVariable('import a from "b";\n5;', 19, 20);
+    });
+
+    test('extracts only as high as it has to', () => {
+      const astExplorer = new AstExplorer('const a = 6;\na + 9;');
+      const expected = {
+        code: 'const a = 6;\nlet _ref = 9;\na + _ref;',
+        cursorPosition: new Position(17, 21),
+      };
+      expect(astExplorer.extractVariable(new Position(17, 18))).toEqual(expected);
     });
   });
 
@@ -34,7 +43,7 @@ describe('extractVariable', () => {
       expectExtractConst('5 + 2', 0, 5);
       expectExtractConst('() => {\n  5 + 2\n}', 10, 11);
       expectExtractConst('let a = do { 5 + 2 }', 13, 14);
-      expectExtractConst('import a from "b";5;', 18, 19);
+      expectExtractConst('import a from "b";\n5;', 19, 20);
     });
   });
 
@@ -60,6 +69,34 @@ describe('extractVariable', () => {
           [{ start: 0, end: 1 }, { start: 4, end: 5 }],
           'const',
         );
+      });
+      test('extracts only as high as it has to 2', () => {
+        const astExplorer = new AstExplorer('const a = 6;\n() => { 5 + 5 };\n5');
+        const expected = {
+          code: 'const a = 6;\nlet _ref = 5;\n() => { _ref + _ref };\n_ref',
+          cursorPosition: new Position(17, 21),
+        };
+        expect(
+          astExplorer.extractMultipleVariables([
+            new Position(30, 31),
+            new Position(21, 22),
+            new Position(25, 26),
+          ]),
+        ).toEqual(expected);
+      });
+      test('extracts only as high as it has to in nested scopes', () => {
+        const astExplorer = new AstExplorer('() => { 5 + 5 };\n5');
+        const expected = {
+          code: 'let _ref = 5;\n() => { _ref + _ref };\n_ref',
+          cursorPosition: new Position(4, 8),
+        };
+        expect(
+          astExplorer.extractMultipleVariables([
+            new Position(17, 18),
+            new Position(8, 9),
+            new Position(12, 13),
+          ]),
+        ).toEqual(expected);
       });
     });
 

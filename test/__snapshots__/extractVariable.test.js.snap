@@ -61,11 +61,12 @@ Object {
 
 exports[`extractVariable with const as a type param returns correct code 6`] = `
 Object {
-  "code": "const _ref = 5;
-import a from \\"b\\";_ref;",
+  "code": "import a from \\"b\\";
+const _ref = 5;
+_ref;",
   "cursorPosition": Position {
-    "end": 10,
-    "start": 6,
+    "end": 29,
+    "start": 25,
   },
 }
 `;
@@ -131,11 +132,12 @@ Object {
 
 exports[`extractVariable with correct selection returns correct code 6`] = `
 Object {
-  "code": "let _ref = 5;
-import a from \\"b\\";_ref;",
+  "code": "import a from \\"b\\";
+let _ref = 5;
+_ref;",
   "cursorPosition": Position {
-    "end": 8,
-    "start": 4,
+    "end": 27,
+    "start": 23,
   },
 }
 `;
