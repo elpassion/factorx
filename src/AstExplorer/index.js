@@ -74,6 +74,7 @@ export default class AstExplorer {
 
   extractMultipleVariables(
     selections: Array<Position>,
+    variableOptions: { type: 'const' | 'let' } = { type: 'let' },
   ): { code: string, identifierPosition: Position | typeof undefined } {
     let replacedNodesCount = 0;
     const road = [];
@@ -88,7 +89,7 @@ export default class AstExplorer {
           if (!node.visited && firstSelection.includes(Position.fromNode(node))) {
             node.visited = true;
             identifier = path.scope.generateUidIdentifierBasedOnNode(node.id);
-            path.scope.push({ id: identifier, init: node });
+            path.scope.push({ id: identifier, init: node, kind: variableOptions.type });
             let roadPath = path.scope.path;
             road.push(roadPath.key);
             while (roadPath.key !== 'program') {
@@ -131,6 +132,7 @@ export default class AstExplorer {
 
   extractVariable(
     selection: Position,
+    variableOptions: { type: 'const' | 'let' } = { type: 'let' },
   ): { code: string, identifierPosition: Position | typeof undefined } {
     let extracted = false;
     const road = [];
@@ -144,7 +146,7 @@ export default class AstExplorer {
           if (!node.visited && selection.includes(Position.fromNode(node))) {
             node.visited = true;
             identifier = path.scope.generateUidIdentifierBasedOnNode(node.id);
-            path.scope.push({ id: identifier, init: node, kind: 'let' });
+            path.scope.push({ id: identifier, init: node, kind: variableOptions.type });
             path.replaceWith(types.identifier(identifier.name));
             extracted = true;
             let roadPath = path.scope.path;

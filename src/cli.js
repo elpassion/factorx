@@ -26,15 +26,15 @@ import { AstExplorer, Position } from '../lib/main';
     }
   }
 
-  async function extractVariableCmd(selections) {
+  async function extractVariableCmd(selections, variableOptions) {
     const file = await getStdin();
     try {
       const astExplorer = new AstExplorer(file);
       let result;
       if (selections.length === 1) {
-        result = astExplorer.extractVariable(selections[0]);
+        result = astExplorer.extractVariable(selections[0], variableOptions);
       } else {
-        result = astExplorer.extractMultipleVariables(selections);
+        result = astExplorer.extractMultipleVariables(selections, variableOptions);
       }
       writeJSON({ status: 'ok', ...result });
     } catch (error) {
@@ -79,7 +79,17 @@ import { AstExplorer, Position } from '../lib/main';
       const intPositions = positions.map(position => parseInt(position, 10));
       const positionPairs = chunk(intPositions, 2);
       const selections = positionPairs.map(([start, end]) => new Position(start, end));
-      extractVariableCmd(selections);
+      extractVariableCmd(selections, { type: 'let' });
+    });
+
+  program
+    .command('extract-constant [positions...]')
+    .description('extract constant at range')
+    .action((positions) => {
+      const intPositions = positions.map(position => parseInt(position, 10));
+      const positionPairs = chunk(intPositions, 2);
+      const selections = positionPairs.map(([start, end]) => new Position(start, end));
+      extractVariableCmd(selections, { type: 'const' });
     });
 
   program
