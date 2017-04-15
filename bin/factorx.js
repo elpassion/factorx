@@ -27,7 +27,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 (function () {
   var extractVariableCmd = function () {
-    var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee(selections) {
+    var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee(selections, variableOptions) {
       var file, astExplorer, result;
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
@@ -44,9 +44,9 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
                 result = void 0;
 
                 if (selections.length === 1) {
-                  result = astExplorer.extractVariable(selections[0]);
+                  result = astExplorer.extractVariable(selections[0], variableOptions);
                 } else {
-                  result = astExplorer.extractMultipleVariables(selections);
+                  result = astExplorer.extractMultipleVariables(selections, variableOptions);
                 }
                 writeJSON(_extends({ status: 'ok' }, result));
               } catch (error) {
@@ -61,7 +61,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
       }, _callee, this);
     }));
 
-    return function extractVariableCmd(_x) {
+    return function extractVariableCmd(_x, _x2) {
       return _ref2.apply(this, arguments);
     };
   }();
@@ -96,7 +96,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
       }, _callee2, this);
     }));
 
-    return function getExpressionsCmd(_x2) {
+    return function getExpressionsCmd(_x3) {
       return _ref3.apply(this, arguments);
     };
   }();
@@ -131,7 +131,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
       }, _callee3, this);
     }));
 
-    return function getExpressionOccurrencesCmd(_x3) {
+    return function getExpressionOccurrencesCmd(_x4) {
       return _ref4.apply(this, arguments);
     };
   }();
@@ -178,7 +178,22 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
       return new _main.Position(start, end);
     });
-    extractVariableCmd(selections);
+    extractVariableCmd(selections, { type: 'let' });
+  });
+
+  _commander2.default.command('extract-constant [positions...]').description('extract constant at range').action(function (positions) {
+    var intPositions = positions.map(function (position) {
+      return parseInt(position, 10);
+    });
+    var positionPairs = (0, _chunk2.default)(intPositions, 2);
+    var selections = positionPairs.map(function (_ref7) {
+      var _ref8 = _slicedToArray(_ref7, 2),
+          start = _ref8[0],
+          end = _ref8[1];
+
+      return new _main.Position(start, end);
+    });
+    extractVariableCmd(selections, { type: 'const' });
   });
 
   _commander2.default.command('get-expression-occurrences <startPosition> <endPosition>').description('get all expressions of the same value at the same scope').action(function (startPosition, endPosition) {

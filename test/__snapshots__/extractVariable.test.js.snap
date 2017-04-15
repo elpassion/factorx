@@ -1,5 +1,75 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`extractVariable with const as a type param returns correct code 1`] = `
+Object {
+  "code": "const _ref = 5;
+_ref + 2",
+  "identifierPosition": Position {
+    "end": 10,
+    "start": 6,
+  },
+}
+`;
+
+exports[`extractVariable with const as a type param returns correct code 2`] = `
+Object {
+  "code": "const _ref = 2;
+5 + _ref",
+  "identifierPosition": Position {
+    "end": 10,
+    "start": 6,
+  },
+}
+`;
+
+exports[`extractVariable with const as a type param returns correct code 3`] = `
+Object {
+  "code": "const _ref = 5 + 2;
+_ref",
+  "identifierPosition": Position {
+    "end": 10,
+    "start": 6,
+  },
+}
+`;
+
+exports[`extractVariable with const as a type param returns correct code 4`] = `
+Object {
+  "code": "() => {
+  const _ref = 5;
+  _ref + 2
+}",
+  "identifierPosition": Position {
+    "end": 20,
+    "start": 16,
+  },
+}
+`;
+
+exports[`extractVariable with const as a type param returns correct code 5`] = `
+Object {
+  "code": "let a = do {
+  const _ref = 5;
+  _ref + 2
+}",
+  "identifierPosition": Position {
+    "end": 25,
+    "start": 21,
+  },
+}
+`;
+
+exports[`extractVariable with const as a type param returns correct code 6`] = `
+Object {
+  "code": "const _ref = 5;
+import a from \\"b\\";_ref;",
+  "identifierPosition": Position {
+    "end": 10,
+    "start": 6,
+  },
+}
+`;
+
 exports[`extractVariable with correct selection returns correct code 1`] = `
 Object {
   "code": "let _ref = 5;
@@ -72,11 +142,22 @@ import a from \\"b\\";_ref;",
 
 exports[`extractVariable with multiple selections with correct selection returns correct code 1`] = `
 Object {
-  "code": "var _ref = 5;
+  "code": "let _ref = 5;
 _ref + _ref",
   "identifierPosition": Position {
     "end": 8,
     "start": 4,
+  },
+}
+`;
+
+exports[`extractVariable with multiple selections with correct selection returns correct code 2`] = `
+Object {
+  "code": "const _ref = 5;
+_ref + _ref",
+  "identifierPosition": Position {
+    "end": 10,
+    "start": 6,
   },
 }
 `;
