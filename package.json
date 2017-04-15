@@ -1,6 +1,6 @@
 {
   "name": "factorx",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Refactoring tool based on ast.",
   "main": "index.js",
   "repository": "https://github.com/michalwarda/factorx.git",
