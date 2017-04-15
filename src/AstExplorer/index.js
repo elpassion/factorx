@@ -144,13 +144,14 @@ export default class AstExplorer {
           if (!node.visited && selection.includes(Position.fromNode(node))) {
             node.visited = true;
             identifier = path.scope.generateUidIdentifierBasedOnNode(node.id);
-            path.scope.push({ id: identifier, init: node });
+            path.scope.push({ id: identifier, init: node, kind: 'let' });
             path.replaceWith(types.identifier(identifier.name));
             extracted = true;
             let roadPath = path.scope.path;
             road.push(roadPath.key);
             while (roadPath.key !== 'program') {
               roadPath = roadPath.parentPath;
+              if (types.isVariableDeclaration(roadPath)) road.push('declarations');
               road.push(roadPath.key);
             }
           }

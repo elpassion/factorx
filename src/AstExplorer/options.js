@@ -5,6 +5,7 @@ const options = {
   parser: {
     parse(source: string) {
       return babylon.parse(source, {
+        sourceType: 'module',
         plugins: [
           'asyncGenerators',
           'classConstructorCall',
