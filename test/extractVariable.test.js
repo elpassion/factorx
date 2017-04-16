@@ -84,6 +84,16 @@ describe('extractVariable', () => {
           ]),
         ).toEqual(expected);
       });
+      test('extracts only as high as it has to 3', () => {
+        const astExplorer = new AstExplorer('const a = () => { 5 + 5 };\n5');
+        const expected = {
+          code: 'const a = () => {\n  let _ref = 5;\n  _ref + _ref\n};\n5',
+          cursorPosition: new Position(24, 28),
+        };
+        expect(
+          astExplorer.extractMultipleVariables([new Position(18, 19), new Position(22, 23)]),
+        ).toEqual(expected);
+      });
       test('extracts only as high as it has to in nested scopes', () => {
         const astExplorer = new AstExplorer('() => { 5 + 5 };\n5');
         const expected = {

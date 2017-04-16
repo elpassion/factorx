@@ -9,6 +9,7 @@ import Expression from '../Expression';
 import ExpressionNotFoundError from '../ExpressionNotFoundError';
 import IdentifierNotFoundError from '../IdentifierNotFoundError';
 import options from './options';
+import ExtractMultipleVariablesOperation from './ExtractMultipleVariablesOperation';
 
 export default class AstExplorer {
   code: string;
@@ -77,80 +78,11 @@ export default class AstExplorer {
     selections: Array<Position>,
     variableOptions: { type: 'const' | 'let' } = { type: 'let' },
   ): { code: string, cursorPosition: Position | typeof undefined } {
-    let replacedNodesCount = 0;
-    const road = [];
-    let cursorPosition;
-    let identifier;
-
-    this.transform((programPath) => {
-      const firstSelection = selections[0];
-      programPath.traverse({
-        Expression: (path) => {
-          const { node } = path;
-          if (!node.visited && firstSelection.includes(Position.fromNode(node))) {
-            node.visited = true;
-            identifier = path.scope.generateUidIdentifierBasedOnNode(node.id);
-            path.scope.push({ id: identifier, init: node, kind: variableOptions.type });
-            let roadPath = path.scope.path;
-            road.push(roadPath.key);
-            while (roadPath.key !== 'program') {
-              roadPath = roadPath.parentPath;
-              road.push(roadPath.key);
-            }
-            path.scope.path.traverse({
-              Expression: (selectionPath) => {
-                if (
-                  selections.find(selection =>
-                    selection.includes(Position.fromNode(selectionPath.node))) &&
-                  !(selectionPath.parent &&
-                    selectionPath.parent.type === 'VariableDeclarator' &&
-                    selectionPath.parent.id === identifier)
-                ) {
-                  replacedNodesCount += 1;
-                  selectionPath.replaceWith(types.identifier(identifier.name));
-                }
-              },
-            });
-          }
-        },
-      });
-    });
-
-    if (replacedNodesCount !== selections.length) throw new ExpressionNotFoundError();
-
-    this.transform((programPath) => {
-      let scope;
-      if (road[0] === 'program') {
-        scope = programPath.scope;
-      } else {
-        const roadPath = rotateArray(road.slice(0, -1).concat(['body'])).join('.');
-        scope = programPath.get(roadPath).scope;
-      }
-      // console.log(scope.bindings);
-      const declarator = scope.bindings[identifier.name];
-      const declaratorPath = declarator.path;
-      const declarationPath = declaratorPath.parentPath;
-      const firstReferencePath = declarator.referencePaths[0];
-      const firstReferencePathParentStatement = firstReferencePath.find(
-        path =>
-          types.isStatement(path) && types.isNodesEquivalent(path.scope.path.node, scope.path.node),
-      );
-      firstReferencePathParentStatement.insertBefore(types.clone(declarationPath.node));
-      declarationPath.remove();
-    });
-
-    this.transform((programPath) => {
-      let scope;
-      if (road[0] === 'program') {
-        scope = programPath.scope;
-      } else {
-        const roadPath = rotateArray(road.slice(0, -1).concat(['body'])).join('.');
-        scope = programPath.get(roadPath).scope;
-      }
-      cursorPosition = Position.fromNode(scope.bindings[identifier.name].path.node.id);
-    });
-
-    return { code: this.code, cursorPosition };
+    return new ExtractMultipleVariablesOperation(
+      this.ast,
+      variableOptions.type,
+      selections,
+    ).start().result;
   }
 
   extractVariable(
@@ -185,7 +117,6 @@ export default class AstExplorer {
     });
 
     if (!extracted) throw new ExpressionNotFoundError();
-
     this.transform((programPath) => {
       let scope;
       if (road[0] === 'program') {
