@@ -26,6 +26,10 @@ describe('extractVariable', () => {
       expectExtractVariable('import a from "b";\n5;', 19, 20);
     });
 
+    test('returns correct code 2', () => {
+      expectExtractVariable('() => {\n  5 + 2\n}', 0, 17);
+    });
+
     test('extracts only as high as it has to', () => {
       const astExplorer = new AstExplorer('const a = 6;\na + 9;');
       const expected = {

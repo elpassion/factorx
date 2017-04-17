@@ -73,11 +73,17 @@ export default class ExtractVariablesOperation {
   }
 
   extractVariable = (programPath: Object) => {
+    // eslint-disable-next-line no-confusing-arrow
+    const getPathScope = path =>
+      types.isArrowFunctionExpression(path) ? path.scope.parent : path.scope;
+
     const firstSelection = this.selections[0];
+
     programPath.traverse({
       Expression: (path) => {
-        const { node, scope } = path;
+        const { node } = path;
         if (!node.visited && firstSelection.includes(Position.fromNode(node))) {
+          const scope = getPathScope(path);
           node.visited = true;
           this.addDeclarationToScope(scope, node);
           this.replaceSelectionsInScope(scope);

@@ -93,6 +93,20 @@ Object {
 }
 `;
 
+exports[`extractVariable with correct selection returns correct code 2 1`] = `
+Object {
+  "code": "let _ref = () => {
+  5 + 2
+};
+
+_ref",
+  "cursorPosition": Position {
+    "end": 8,
+    "start": 4,
+  },
+}
+`;
+
 exports[`extractVariable with correct selection returns correct code 3`] = `
 Object {
   "code": "let _ref = 5 + 2;
