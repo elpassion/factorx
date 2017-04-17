@@ -7,7 +7,7 @@ import Position from '../Position';
 import ExpressionNotFoundError from '../ExpressionNotFoundError';
 import options from './options';
 
-export default class ExportMultipleVariablesOperation {
+export default class ExtractVariablesOperation {
   ast: Object;
   code: string;
   replacedNodesCount: number;

@@ -9,7 +9,7 @@ import Expression from '../Expression';
 import ExpressionNotFoundError from '../ExpressionNotFoundError';
 import IdentifierNotFoundError from '../IdentifierNotFoundError';
 import options from './options';
-import ExtractMultipleVariablesOperation from './ExtractMultipleVariablesOperation';
+import ExtractVariablesOperation from './ExtractVariablesOperation';
 
 export default class AstExplorer {
   code: string;
@@ -74,78 +74,12 @@ export default class AstExplorer {
     return paths.map(path => path.node).map(this.serializeNode);
   }
 
-  extractMultipleVariables(
-    selections: Array<Position>,
-    variableOptions: { type: 'const' | 'let' } = { type: 'let' },
-  ): { code: string, cursorPosition: Position | typeof undefined } {
-    return new ExtractMultipleVariablesOperation(
-      this.ast,
-      variableOptions.type,
-      selections,
-    ).start().result;
-  }
-
   extractVariable(
-    selection: Position,
+    selection: Position | Array<Position>,
     variableOptions: { type: 'const' | 'let' } = { type: 'let' },
   ): { code: string, cursorPosition: Position | typeof undefined } {
-    let extracted = false;
-    const road = [];
-    let cursorPosition;
-    let identifier;
-
-    this.transform((programPath) => {
-      programPath.traverse({
-        Expression: (path) => {
-          const { node } = path;
-          if (!node.visited && selection.includes(Position.fromNode(node))) {
-            node.visited = true;
-            identifier = path.scope.generateUidIdentifierBasedOnNode(node.id);
-            path.scope.push({ id: identifier, init: node, kind: variableOptions.type });
-            path.replaceWith(types.identifier(identifier.name));
-            extracted = true;
-            let roadPath = path.scope.path;
-            road.push(roadPath.key);
-            while (roadPath.key !== 'program') {
-              roadPath = roadPath.parentPath;
-              if (types.isVariableDeclaration(roadPath)) road.push('declarations');
-              road.push(roadPath.key);
-            }
-          }
-        },
-      });
-    });
-
-    if (!extracted) throw new ExpressionNotFoundError();
-    this.transform((programPath) => {
-      let scope;
-      if (road[0] === 'program') {
-        scope = programPath.scope;
-      } else {
-        const roadPath = rotateArray(road.slice(0, -1).concat(['body'])).join('.');
-        scope = programPath.get(roadPath).scope;
-      }
-      const declarator = scope.bindings[identifier.name];
-      const declaratorPath = declarator.path;
-      const declarationPath = declaratorPath.parentPath;
-      const firstReferencePath = declarator.referencePaths[0];
-      const firstReferencePathParentStatement = firstReferencePath.getStatementParent();
-      firstReferencePathParentStatement.insertBefore(types.clone(declarationPath.node));
-      declarationPath.remove();
-    });
-
-    this.transform((programPath) => {
-      let scope;
-      if (road[0] === 'program') {
-        scope = programPath.scope;
-      } else {
-        const roadPath = rotateArray(road.slice(0, -1).concat(['body'])).join('.');
-        scope = programPath.get(roadPath).scope;
-      }
-      cursorPosition = Position.fromNode(scope.bindings[identifier.name].path.node.id);
-    });
-
-    return { code: this.code, cursorPosition };
+    const selections = Array.isArray(selection) ? selection : [selection];
+    return new ExtractVariablesOperation(this.ast, variableOptions.type, selections).start().result;
   }
 
   renameIdentifier(selection: Position, newName: string) {

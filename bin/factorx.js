@@ -41,13 +41,8 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
               try {
                 astExplorer = new _main.AstExplorer(file);
-                result = void 0;
+                result = astExplorer.extractVariable(selections, variableOptions);
 
-                if (selections.length === 1) {
-                  result = astExplorer.extractVariable(selections[0], variableOptions);
-                } else {
-                  result = astExplorer.extractMultipleVariables(selections, variableOptions);
-                }
                 writeJSON(_extends({ status: 'ok' }, result));
               } catch (error) {
                 writeJSON(createMessageFromError(error));

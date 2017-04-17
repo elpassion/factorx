@@ -33,12 +33,7 @@ import { AstExplorer, Position } from '../lib/main';
     const file = await getStdin();
     try {
       const astExplorer = new AstExplorer(file);
-      let result;
-      if (selections.length === 1) {
-        result = astExplorer.extractVariable(selections[0], variableOptions);
-      } else {
-        result = astExplorer.extractMultipleVariables(selections, variableOptions);
-      }
+      const result = astExplorer.extractVariable(selections, variableOptions);
       writeJSON({ status: 'ok', ...result });
     } catch (error) {
       writeJSON(createMessageFromError(error));

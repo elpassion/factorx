@@ -60,7 +60,7 @@ describe('extractVariable', () => {
       const expectExtractMultipleVariables = (code, selections, type = 'let') => {
         const positions = selections.map(selection => new Position(selection.start, selection.end));
         const astExplorer = new AstExplorer(code);
-        expect(astExplorer.extractMultipleVariables(positions, { type })).toMatchSnapshot();
+        expect(astExplorer.extractVariable(positions, { type })).toMatchSnapshot();
       };
       test('returns correct code', () => {
         expectExtractMultipleVariables('5 + 5', [{ start: 0, end: 1 }, { start: 4, end: 5 }]);
@@ -77,7 +77,7 @@ describe('extractVariable', () => {
           cursorPosition: new Position(17, 21),
         };
         expect(
-          astExplorer.extractMultipleVariables([
+          astExplorer.extractVariable([
             new Position(30, 31),
             new Position(21, 22),
             new Position(25, 26),
@@ -90,9 +90,9 @@ describe('extractVariable', () => {
           code: 'const a = () => {\n  let _ref = 5;\n  _ref + _ref\n};\n5',
           cursorPosition: new Position(24, 28),
         };
-        expect(
-          astExplorer.extractMultipleVariables([new Position(18, 19), new Position(22, 23)]),
-        ).toEqual(expected);
+        expect(astExplorer.extractVariable([new Position(18, 19), new Position(22, 23)])).toEqual(
+          expected,
+        );
       });
       test('extracts only as high as it has to in nested scopes', () => {
         const astExplorer = new AstExplorer('() => { 5 + 5 };\n5');
@@ -101,7 +101,7 @@ describe('extractVariable', () => {
           cursorPosition: new Position(4, 8),
         };
         expect(
-          astExplorer.extractMultipleVariables([
+          astExplorer.extractVariable([
             new Position(17, 18),
             new Position(8, 9),
             new Position(12, 13),
@@ -117,7 +117,7 @@ describe('extractVariable', () => {
         );
         const astExplorer = new AstExplorer('5 + 5');
         expect(() => {
-          astExplorer.extractMultipleVariables(positions);
+          astExplorer.extractVariable(positions);
         }).toThrowError(new ExpressionNotFoundError());
       });
     });
