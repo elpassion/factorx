@@ -4,6 +4,7 @@ import 'babel-polyfill';
 import program from 'commander';
 import getStdin from 'get-stdin';
 import chunk from 'lodash/chunk';
+import { version } from '../package.json';
 import { AstExplorer, Position } from '../lib/main';
 
 (() => {
@@ -117,5 +118,5 @@ import { AstExplorer, Position } from '../lib/main';
       getExpressionOccurrencesCmd(selection);
     });
 
-  program.version('0.0.1').parse(process.argv);
+  program.version(version).parse(process.argv);
 })();

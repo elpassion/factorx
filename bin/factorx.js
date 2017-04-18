@@ -19,6 +19,8 @@ var _chunk = require('lodash/chunk');
 
 var _chunk2 = _interopRequireDefault(_chunk);
 
+var _package = require('../package.json');
+
 var _main = require('../lib/main');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -240,5 +242,5 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
     getExpressionOccurrencesCmd(selection);
   });
 
-  _commander2.default.version('0.0.1').parse(process.argv);
+  _commander2.default.version(_package.version).parse(process.argv);
 })();
