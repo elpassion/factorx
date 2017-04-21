@@ -77,7 +77,7 @@ export default class AstExplorer {
   extractVariable(
     selection: Position | Array<Position>,
     variableOptions: { type: 'const' | 'let' } = { type: 'let' },
-  ): { code: string, cursorPosition: Position | typeof undefined } {
+  ): { code: string, cursorPositions: Array<Position> } {
     const selections = Array.isArray(selection) ? selection : [selection];
     return new ExtractVariablesOperation(this.ast, variableOptions.type, selections).start().result;
   }

@@ -15,7 +15,7 @@ export default class ExtractVariablesOperation {
   variableType: 'const' | 'let';
   variableIdentifier: Object;
   selections: Array<Position>;
-  cursorPosition: Position;
+  cursorPositions: Array<Position>;
 
   constructor(ast: Object, variableType: 'const' | 'let' = 'let', selections: Array<Position>) {
     this.ast = ast;
@@ -137,21 +137,21 @@ export default class ExtractVariablesOperation {
           declaratorPath.node.id.name === this.variableIdentifier.name
         ) {
           const { scope } = declaratorPath;
-          this.cursorPosition = Position.fromNode(
-            scope.bindings[this.variableIdentifier.name].path.node.id,
-          );
+          const binding = scope.bindings[this.variableIdentifier.name];
+          const referencePaths = binding.referencePaths.map(path => Position.fromNode(path.node));
+          this.cursorPositions = [Position.fromNode(binding.path.node.id), ...referencePaths];
           programPath.stop();
         }
       },
     });
   };
 
-  start(): { ast: Object, result: { code: string, cursorPosition: Position | typeof undefined } } {
+  start(): { ast: Object, result: { code: string, cursorPositions: Array<Position> } } {
     this.transform(this.extractVariable);
     this.transform(this.moveDeclaration);
     this.transform(this.setCursorPosition);
 
-    return { ast: this.ast, result: { code: this.code, cursorPosition: this.cursorPosition } };
+    return { ast: this.ast, result: { code: this.code, cursorPositions: this.cursorPositions } };
   }
 
   transform(transformation: Function) {
