@@ -33,7 +33,8 @@ export default class ExtractVariablesOperation {
     const isExpressionIncluded = selection =>
       selection.includes(Position.fromNode(expressionPath.node));
 
-    const isExpressionTheDeclaration = expressionPath.parent &&
+    const isExpressionTheDeclaration =
+      expressionPath.parent &&
       expressionPath.parent.type === 'VariableDeclarator' &&
       expressionPath.parent.id === this.variableIdentifier;
 
@@ -75,7 +76,7 @@ export default class ExtractVariablesOperation {
   extractVariable = (programPath: Object) => {
     // eslint-disable-next-line no-confusing-arrow
     const getPathScope = path =>
-      types.isArrowFunctionExpression(path) ? path.scope.parent : path.scope;
+      (types.isArrowFunctionExpression(path) ? path.scope.parent : path.scope);
 
     const firstSelection = this.selections[0];
 

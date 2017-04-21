@@ -26,7 +26,9 @@ export default class Position {
   }
 
   includes(otherPosition: Position) {
-    return (this.isBlank() && this.includesPosition(otherPosition)) ||
-      this.equalToPosition(otherPosition);
+    return (
+      (this.isBlank() && this.includesPosition(otherPosition)) ||
+      this.equalToPosition(otherPosition)
+    );
   }
 }

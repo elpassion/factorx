@@ -1,23 +1,7 @@
 // @flow
-import reduceRight from 'lodash/reduceRight';
+import _ from 'lodash';
 
-import type { selection } from './types';
-
-function changeLocationLine({ line, column }, diff) {
-  return { line: line + diff, column };
-}
-
-export function normalizeSelection({ start, end }: selection): selection {
-  return { start: changeLocationLine(start, 1), end: changeLocationLine(end, 1) };
-}
-
-export function denormalizeSelection({ start, end }: selection): selection {
-  return {
-    start: changeLocationLine(start, -1),
-    end: changeLocationLine(end, -1),
-  };
-}
-
-export function rotateArray(array: Array<any>): Array<any> {
-  return reduceRight(array, (acc, node) => acc.concat([node]), []);
+// eslint-disable-next-line import/prefer-default-export
+export function rotateArray<T>(array: Array<T>): Array<T> {
+  return _.reduceRight(array, (acc, node) => acc.concat([node]), []);
 }
