@@ -2,7 +2,7 @@
   "name": "factorx",
   "version": "0.1.8",
   "description": "Refactoring tool based on ast.",
-  "main": "index.js",
+  "main": "./lib/main.js",
   "repository": "https://github.com/michalwarda/factorx.git",
   "author": "Michał Warda",
   "license": "MIT",
