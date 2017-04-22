@@ -1,122 +1,79 @@
-#! /usr/bin/env node
 // @flow
-import 'babel-polyfill';
-import program from 'commander';
-import getStdin from 'get-stdin';
 import chunk from 'lodash/chunk';
-import { version } from '../package.json';
 import { AstExplorer, Position } from '../lib/main';
 
-(() => {
-  function writeJSON(message) {
-    process.stdout.write(JSON.stringify(message));
-  }
-
-  function createMessageFromError({ name, message }) {
-    const status = 'error';
-    switch (name) {
-      case 'ExpressionNotFound': {
-        return { status, error: { name, message } };
-      }
-      case 'IdentifierNotFound': {
-        return { status, error: { name, message } };
-      }
-      case 'SyntaxError': {
-        return { status, error: { name, message: 'Unable to parse the code' } };
-      }
-      default: {
-        return { status, error: { name, message } };
-      }
+function createMessageFromError({ name, message }) {
+  const status = 'error';
+  switch (name) {
+    case 'ExpressionNotFound': {
+      return { status, error: { name, message } };
+    }
+    case 'IdentifierNotFound': {
+      return { status, error: { name, message } };
+    }
+    case 'SyntaxError': {
+      return { status, error: { name, message: 'Unable to parse the code' } };
+    }
+    default: {
+      return { status, error: { name, message } };
     }
   }
+}
 
-  async function extractVariableCmd(selections, variableOptions) {
-    const file = await getStdin();
+module.exports = {
+  'get-expressions': (file: string, args: Array<string>) => {
     try {
-      const astExplorer = new AstExplorer(file);
-      const result = astExplorer.extractVariable(selections, variableOptions);
-      writeJSON({ status: 'ok', ...result });
-    } catch (error) {
-      writeJSON(createMessageFromError(error));
-    }
-  }
-
-  async function getExpressionsCmd(selection) {
-    const file = await getStdin();
-    try {
+      const selection = new Position(parseInt(args[0], 10), parseInt(args[1], 10));
       const astExplorer = new AstExplorer(file);
       const expressions = astExplorer.findExpressions(selection);
-      writeJSON({ status: 'ok', expressions });
-    } catch (error) {
-      writeJSON(createMessageFromError(error));
+      return { status: 'ok', expressions };
+    } catch (e) {
+      return createMessageFromError(e);
     }
-  }
-
-  async function renameIdentifierCmd(selection, newName) {
-    const file = await getStdin();
+  },
+  'extract-variable': (file: string, args: Array<string>) => {
     try {
+      const intPositions = args.map(position => parseInt(position, 10));
+      const positionPairs = chunk(intPositions, 2);
+      const selections = positionPairs.map(([start, end]) => new Position(start, end));
+      const astExplorer = new AstExplorer(file);
+      const result = astExplorer.extractVariable(selections, { type: 'let' });
+      return { status: 'ok', ...result };
+    } catch (e) {
+      return createMessageFromError(e);
+    }
+  },
+  'extract-constant': (file: string, args: Array<string>) => {
+    try {
+      const intPositions = args.map(position => parseInt(position, 10));
+      const positionPairs = chunk(intPositions, 2);
+      const selections = positionPairs.map(([start, end]) => new Position(start, end));
+      const astExplorer = new AstExplorer(file);
+      const result = astExplorer.extractVariable(selections, { type: 'const' });
+      return { status: 'ok', ...result };
+    } catch (e) {
+      return createMessageFromError(e);
+    }
+  },
+  'rename-identifier': (file: string, args: Array<string>) => {
+    try {
+      const selection = new Position(parseInt(args[0], 10), parseInt(args[1], 10));
+      const newName = args[2];
       const astExplorer = new AstExplorer(file);
       const result = astExplorer.renameIdentifier(selection, newName);
-      writeJSON({ status: 'ok', ...result });
-    } catch (error) {
-      writeJSON(createMessageFromError(error));
+      return { status: 'ok', ...result };
+    } catch (e) {
+      return createMessageFromError(e);
     }
-  }
-
-  async function getExpressionOccurrencesCmd(selection) {
-    const file = await getStdin();
+  },
+  'get-expression-occurrences': (file: string, args: Array<string>) => {
     try {
+      const selection = new Position(parseInt(args[0], 10), parseInt(args[1], 10));
       const astExplorer = new AstExplorer(file);
       const expressions = astExplorer.findExpressionOccurrences(selection);
-      writeJSON({ status: 'ok', expressions });
-    } catch (error) {
-      writeJSON(createMessageFromError(error));
+      return { status: 'ok', expressions };
+    } catch (e) {
+      return createMessageFromError(e);
     }
-  }
-
-  program
-    .command('get-expressions <startPosition> <endPosition>')
-    .description('get expressions at range')
-    .action((startPosition, endPosition) => {
-      const selection = new Position(parseInt(startPosition, 10), parseInt(endPosition, 10));
-      getExpressionsCmd(selection);
-    });
-
-  program
-    .command('extract-variable [positions...]')
-    .description('extract variable at range')
-    .action((positions) => {
-      const intPositions = positions.map(position => parseInt(position, 10));
-      const positionPairs = chunk(intPositions, 2);
-      const selections = positionPairs.map(([start, end]) => new Position(start, end));
-      extractVariableCmd(selections, { type: 'let' });
-    });
-
-  program
-    .command('extract-constant [positions...]')
-    .description('extract constant at range')
-    .action((positions) => {
-      const intPositions = positions.map(position => parseInt(position, 10));
-      const positionPairs = chunk(intPositions, 2);
-      const selections = positionPairs.map(([start, end]) => new Position(start, end));
-      extractVariableCmd(selections, { type: 'const' });
-    });
-
-  program
-    .command('rename-identifier <startPosition> <endPosition> <newName>')
-    .description('extract constant at range')
-    .action((startPosition, endPosition, newName) => {
-      const selection = new Position(parseInt(startPosition, 10), parseInt(endPosition, 10));
-      renameIdentifierCmd(selection, newName);
-    });
-
-  program
-    .command('get-expression-occurrences <startPosition> <endPosition>')
-    .description('get all expressions of the same value at the same scope')
-    .action((startPosition, endPosition) => {
-      const selection = new Position(parseInt(startPosition, 10), parseInt(endPosition, 10));
-      getExpressionOccurrencesCmd(selection);
-    });
-
-  program.version(version).parse(process.argv);
-})();
+  },
+};
