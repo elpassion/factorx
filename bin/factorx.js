@@ -12,12 +12,12 @@ const spawnServer = (file) => {
   // eslint-disable-next-line global-require
   const path = require('path');
   // eslint-disable-next-line global-require
-  const fs = require('fs');
-  const out = fs.openSync(path.join(__dirname, '..', 'Server', 'out.log'), 'a');
-  const err = fs.openSync(path.join(__dirname, '..', 'Server', 'err.log'), 'a');
+  // const fs = require('fs');
+  // const out = fs.openSync(path.join(__dirname, '..', 'Server', 'out.log'), 'a');
+  // const err = fs.openSync(path.join(__dirname, '..', 'Server', 'err.log'), 'a');
   const child = spawn('node', [path.join(__dirname, '..', 'Server')], {
     detached: true,
-    stdio: ['ignore', out, err],
+    stdio: 'ignore', //['ignore', out, err],
   });
 
   child.unref();

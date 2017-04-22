@@ -39,12 +39,14 @@ export default class AstExplorer {
     if (parentBlock.type === 'ArrowFunctionExpression' && paths.length !== 1) {
       parentBlock = parentBlock.body;
     }
-    return rotateArray(
+    const filteredPaths = rotateArray(
       paths
         .filter(path => parentBlock.start <= path.node.start && parentBlock.end >= path.node.end)
         .map(path => path.node)
         .map(this.serializeNode),
     );
+    if (filteredPaths.length === 0) throw new ExpressionNotFoundError();
+    return filteredPaths;
   }
 
   findExpressionOccurrences(selection: Position): Array<Expression> {
