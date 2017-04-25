@@ -1,4 +1,5 @@
 // input
-/* C */5 + 5;
+/* CS */5/* CE */ + 5;
 // output
-/* C */5 + 5;
+const /* CS */extracted/* CE */ = () => 5;
+/* CS */extracted/* CE */() + 5;

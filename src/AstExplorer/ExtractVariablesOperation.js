@@ -74,7 +74,6 @@ export default class ExtractVariablesOperation {
   }
 
   extractVariable = (programPath: Object) => {
-    // eslint-disable-next-line no-confusing-arrow
     const getPathScope = path =>
       (types.isArrowFunctionExpression(path) ? path.scope.parent : path.scope);
 

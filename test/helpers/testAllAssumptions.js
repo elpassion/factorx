@@ -70,16 +70,20 @@ const parseFile = (path: string) => {
   return { input: parseCode(input), output: parseCode(output) };
 };
 
-const testAssumption = (path: string) => {
+const testAssumption = (path: string, transformation: Function) => {
   const { input, output } = parseFile(path);
   test(`Assumptions in ${path} are correct`, () => {
-    expect(input).toEqual(output);
+    expect(transformation(input)).toEqual(output);
   });
 };
 
-const testAllAssumptions = (folderName: string, { only }: { only: string } = {}) => {
+const testAllAssumptions = (
+  folderName: string,
+  transformation: Function,
+  { only }: { only: string } = {},
+) => {
   const files = glob.sync(`test/${folderName}/${only || '*'}.compare.js`);
-  files.forEach(testAssumption);
+  files.forEach(file => testAssumption(file, transformation));
 };
 
 export default testAllAssumptions;
