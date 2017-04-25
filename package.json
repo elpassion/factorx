@@ -12,7 +12,7 @@
     "test": "jest",
     "watch": "jest --watch",
     "flow-typed": "flow-typed install",
-    "lint": "eslint 'src/**'",
+    "lint": "eslint 'src/** test/**'",
     "prepublish": "babel src -d lib"
   },
   "bin": {
@@ -54,6 +54,7 @@
     "babylon": "^6.16.1",
     "commander": "^2.9.0",
     "get-stdin": "^5.0.1",
+    "glob": "^7.1.1",
     "lodash": "^4.17.4",
     "recast": "^0.12.3"
   }
