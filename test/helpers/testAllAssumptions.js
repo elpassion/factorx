@@ -28,7 +28,7 @@ const parseCode = (code: string) => {
       selections.push({ start, end });
     }
     return {
-      code: newCode,
+      code: newCode.trim(),
       selections,
     };
   };

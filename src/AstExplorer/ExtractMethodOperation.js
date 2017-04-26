@@ -30,7 +30,7 @@ export default class ExtractMethodOperation {
   getPathScope = (path: Object) =>
     (types.isArrowFunctionExpression(path) ? path.scope.parent : path.scope);
 
-  findDeepestIncludedPath = (programPath: Object) => {
+  findDeepestIncludingPath = (programPath: Object) => {
     const state = {};
     programPath.traverse({
       enter: (path) => {
@@ -41,7 +41,7 @@ export default class ExtractMethodOperation {
         }
       },
     });
-    return state.deepestIncludedPath;
+    return state.deepestIncludedPath || programPath;
   };
 
   cloneSelectedNodes = (pathNodes: Array<Object>) => {
@@ -91,21 +91,35 @@ export default class ExtractMethodOperation {
     return { id: this.variableIdentifier, init: functionExpression, kind: 'const' };
   };
 
+  extractMultipleNodes = (deepestIncludedPath: Object) => {
+    const scope = this.getPathScope(deepestIncludedPath);
+    const nodes = this.cloneSelectedNodes(deepestIncludedPath.node.body);
+    this.removeSelectedNodes(deepestIncludedPath, nodes);
+    scope.push(this.buildVariableDeclaration(types.blockStatement(nodes)));
+  };
+
+  extractExpression = (deepestIncludedPath: Object) => {
+    const scope = this.getPathScope(deepestIncludedPath);
+    const node = deepestIncludedPath.node;
+    scope.push(this.buildVariableDeclaration(types.clone(node)));
+    deepestIncludedPath.replaceWith(this.buildExpressionStatement());
+  };
+
+  extractStatement = (deepestIncludedPath: Object) => {
+    const scope = this.getPathScope(deepestIncludedPath);
+    const node = types.blockStatement([types.clone(deepestIncludedPath.node)]);
+    scope.push(this.buildVariableDeclaration(types.clone(node)));
+    deepestIncludedPath.replaceWith(this.buildExpressionStatement());
+  };
+
   extractMethod = (programPath: Object) => {
-    let deepestIncludedPath = this.findDeepestIncludedPath(programPath);
-    if (deepestIncludedPath) {
-      const scope = this.getPathScope(deepestIncludedPath);
-      const node = types.isExpression(deepestIncludedPath.node)
-        ? deepestIncludedPath.node
-        : types.blockStatement([types.clone(deepestIncludedPath.node)]);
-      scope.push(this.buildVariableDeclaration(types.clone(node)));
-      deepestIncludedPath.replaceWith(this.buildExpressionStatement());
-    } else {
-      deepestIncludedPath = programPath;
-      const scope = this.getPathScope(deepestIncludedPath);
-      const nodes = this.cloneSelectedNodes(deepestIncludedPath.node.body);
-      this.removeSelectedNodes(deepestIncludedPath, nodes);
-      scope.push(this.buildVariableDeclaration(types.blockStatement(nodes)));
+    const deepestIncludingPath = this.findDeepestIncludingPath(programPath);
+    if (types.isBlock(deepestIncludingPath)) {
+      this.extractMultipleNodes(deepestIncludingPath);
+    } else if (types.isExpression(deepestIncludingPath)) {
+      this.extractExpression(deepestIncludingPath);
+    } else if (types.isStatement(deepestIncludingPath)) {
+      this.extractStatement(deepestIncludingPath);
     }
   };
 

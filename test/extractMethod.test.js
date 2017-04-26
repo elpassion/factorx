@@ -10,7 +10,7 @@ testAllAssumptions('extractMethod', ({ code, selections }) => {
     selections.map(({ start, end }) => new Position(start, end)),
   );
   return {
-    code: result.code.concat('\n'),
+    code: result.code,
     selections: result.cursorPositions.map(({ start, end }) => ({
       start,
       end,
