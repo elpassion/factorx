@@ -148,7 +148,6 @@ export default class AstExplorer {
     //       ) {
     //         const { scope } = declaratorPath;
     //         const binding = scope.bindings.extracted;
-    //         const referencePaths = binding.referencePaths.map(path => Position.fromNode(path.node));
     //         cursorPositions = [Position.fromNode(binding.path.node.id), ...referencePaths];
     //         programPath.stop();
     //       }

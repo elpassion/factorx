@@ -1,8 +1,12 @@
 // input
-/* CS */const a = 5 + 5;/* CE */
+5 + 5;
+/* CS */5 + 5;
+5 + 5;/* CE */
 // output
 const extracted = () => {
-  const a = 5 + 5;
+  5 + 5;
+  5 + 5;
 };
 
+5 + 5;
 extracted();
