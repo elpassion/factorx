@@ -49,11 +49,11 @@ export default class ExtractMethodOperation {
     const startNodeIndex = findIndex(nodes, {
       start: this.selection.start,
     });
-    const endNodeIndex =
-      findIndex(nodes, {
-        end: this.selection.end,
-      }) + 1;
-    nodes = nodes.slice(startNodeIndex, endNodeIndex);
+    const endNodeIndex = findIndex(nodes, {
+      end: this.selection.end,
+    });
+    if (startNodeIndex === -1 || endNodeIndex === -1) throw new ExpressionNotFoundError();
+    nodes = nodes.slice(startNodeIndex, endNodeIndex + 1);
     return nodes.map(node => types.clone(node));
   };
 
