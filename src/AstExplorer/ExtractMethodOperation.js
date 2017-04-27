@@ -10,7 +10,6 @@ import options from './options';
 export default class ExtractMethodOperation {
   ast: Object;
   code: string;
-  replacedNodesCount: number;
   scopeRoad: Array<any>;
   variableIdentifier: Object;
   selections: Array<Position>;
@@ -19,7 +18,6 @@ export default class ExtractMethodOperation {
 
   constructor(ast: Object, selections: Array<Position>) {
     this.ast = ast;
-    this.replacedNodesCount = 0;
     this.scopeRoad = [];
     this.selections = selections;
     this.selection = selections[0];
@@ -57,8 +55,8 @@ export default class ExtractMethodOperation {
     return nodes.map(node => types.clone(node));
   };
 
-  buildExpressionStatement = () => {
-    const callExpression = types.callExpression(this.variableIdentifier, []);
+  buildExpressionStatement = (args: Array<Object> = []) => {
+    const callExpression = types.callExpression(this.variableIdentifier, args);
     return types.expressionStatement(callExpression);
   };
 
@@ -86,12 +84,12 @@ export default class ExtractMethodOperation {
     });
   };
 
-  buildVariableDeclaration = (body) => {
-    const functionExpression = types.arrowFunctionExpression([], body);
+  buildVariableDeclaration = (body, params: Array<Object> = []) => {
+    const functionExpression = types.arrowFunctionExpression(params, body);
     return { id: this.variableIdentifier, init: functionExpression, kind: 'const' };
   };
 
-  extractMultipleNodes = (deepestIncludedPath: Object) => {
+  extractMultipleStatements = (deepestIncludedPath: Object) => {
     const scope = this.getPathScope(deepestIncludedPath);
     const nodes = this.cloneSelectedNodes(deepestIncludedPath.node.body);
     this.removeSelectedNodes(deepestIncludedPath, nodes);
@@ -101,21 +99,36 @@ export default class ExtractMethodOperation {
   extractExpression = (deepestIncludedPath: Object) => {
     const scope = this.getPathScope(deepestIncludedPath);
     const node = deepestIncludedPath.node;
-    scope.push(this.buildVariableDeclaration(types.clone(node)));
-    deepestIncludedPath.replaceWith(this.buildExpressionStatement());
+    const args = types.isIdentifier(node) ? [types.clone(node)] : [];
+    scope.push(this.buildVariableDeclaration(types.clone(node), args));
+    deepestIncludedPath.replaceWith(this.buildExpressionStatement(args));
   };
 
   extractStatement = (deepestIncludedPath: Object) => {
     const scope = this.getPathScope(deepestIncludedPath);
     const node = types.blockStatement([types.clone(deepestIncludedPath.node)]);
-    scope.push(this.buildVariableDeclaration(types.clone(node)));
-    deepestIncludedPath.replaceWith(this.buildExpressionStatement());
+    const referencedBindings = Object.entries(scope.bindings).reduce((acc, [name, binding]) => {
+      const innerBindings = binding.referencePaths.filter(
+        ({ node: referenceNode }) =>
+          !Position.fromNode(deepestIncludedPath.node).includes(Position.fromNode(referenceNode)),
+      );
+      if (innerBindings.length === 0) {
+        return acc;
+      }
+      return { ...acc, [name]: { identifier: binding.identifier, innerBindings } };
+    }, {});
+    const args = Object.entries(referencedBindings).reduce(
+      (acc, [_name, { identifier }]) => [...acc, identifier],
+      [],
+    );
+    scope.push(this.buildVariableDeclaration(types.clone(node), args));
+    deepestIncludedPath.replaceWith(this.buildExpressionStatement(args));
   };
 
   extractMethod = (programPath: Object) => {
     const deepestIncludingPath = this.findDeepestIncludingPath(programPath);
     if (types.isBlock(deepestIncludingPath)) {
-      this.extractMultipleNodes(deepestIncludingPath);
+      this.extractMultipleStatements(deepestIncludingPath);
     } else if (types.isExpression(deepestIncludingPath)) {
       this.extractExpression(deepestIncludingPath);
     } else if (types.isStatement(deepestIncludingPath)) {
