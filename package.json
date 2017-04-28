@@ -4,11 +4,11 @@
   "version": "0.2.0",
   "description": "Refactoring tool based on ast.",
   "keywords": [
-    'refactoring',
-    'factorx',
-    'javascript',
-    'atom',
-    'vscode'
+    "refactoring",
+    "factorx",
+    "javascript",
+    "atom",
+    "vscode"
   ],
   "repository": "https://github.com/michalwarda/factorx.git",
   "author": "Michał Warda",
