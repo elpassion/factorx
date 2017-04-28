@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "flow": "flow",
-    "build": "babel src -d lib && cp -r ./Client/index.js ./bin/factorx.js",
+    "build": "babel src -d lib",
     "test": "jest",
     "watch": "jest --watch",
     "flow-typed": "flow-typed install",
