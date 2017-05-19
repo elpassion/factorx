@@ -14,8 +14,9 @@ export default class ExtractVariablesOperation {
   scopeRoad: Array<any>;
   variableType: 'const' | 'let';
   variableIdentifier: Object;
+  variableDeclarator: Object;
   selections: Array<Position>;
-  cursorPositions: Array<Position>;
+  cursorPositions: Array<Position> = [];
 
   constructor(ast: Object, variableType: 'const' | 'let' = 'let', selections: Array<Position>) {
     this.ast = ast;
@@ -54,9 +55,26 @@ export default class ExtractVariablesOperation {
     });
   }
 
-  addDeclarationToScope(scope: Object, node: Object) {
-    this.variableIdentifier = scope.generateUidIdentifierBasedOnNode(node.id);
-    scope.push({ id: this.variableIdentifier, init: node, kind: this.variableType });
+  addDeclarationToScope(scope: Object, path: Object) {
+    if (types.isMemberExpression(path)) {
+      const { node } = path;
+      this.variableIdentifier = scope.generateUidIdentifierBasedOnNode(node.id);
+      scope.push({ id: this.variableIdentifier, init: node, kind: this.variableType });
+      const variableDeclarator = types.variableDeclarator(
+        types.objectPattern([
+          types.objectProperty(types.clone(node.property), types.clone(node.property), false, true),
+        ]),
+        node.object,
+      );
+
+      scope.bindings[this.variableIdentifier.name].path.replaceWith(variableDeclarator);
+      this.variableDeclarator = variableDeclarator;
+      this.variableIdentifier = node.property;
+    } else {
+      const { node } = path;
+      this.variableIdentifier = scope.generateUidIdentifierBasedOnNode(node.id);
+      scope.push({ id: this.variableIdentifier, init: node, kind: this.variableType });
+    }
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -76,7 +94,7 @@ export default class ExtractVariablesOperation {
   extractVariable = (programPath: Object) => {
     // eslint-disable-next-line no-confusing-arrow
     const getPathScope = path =>
-      (types.isArrowFunctionExpression(path) ? path.scope.parent : path.scope);
+      types.isArrowFunctionExpression(path) ? path.scope.parent : path.scope;
 
     const firstSelection = this.selections[0];
 
@@ -86,7 +104,7 @@ export default class ExtractVariablesOperation {
         if (!node.visited && firstSelection.includes(Position.fromNode(node))) {
           const scope = getPathScope(path);
           node.visited = true;
-          this.addDeclarationToScope(scope, node);
+          this.addDeclarationToScope(scope, path);
           this.replaceSelectionsInScope(scope);
           this.saveScopeRoad(scope);
           if (this.isAllSelectionsExtracted()) programPath.stop();
@@ -103,19 +121,26 @@ export default class ExtractVariablesOperation {
       {
         VariableDeclarator: (declaratorPath, state) => {
           if (
-            isEqual(this.findScopeRoad(declaratorPath.scope), this.scopeRoad) &&
-            declaratorPath.node.id.name === this.variableIdentifier.name
+            (isEqual(this.findScopeRoad(declaratorPath.scope), this.scopeRoad) &&
+              declaratorPath.node.id.name === this.variableIdentifier.name) ||
+            (types.isObjectPattern(declaratorPath.node.id) &&
+              declaratorPath.node.id.properties
+                .map(property => property.value.name)
+                .includes(this.variableIdentifier.name))
           ) {
             const { scope } = declaratorPath;
             const binding = scope.bindings[this.variableIdentifier.name];
             const declarationPath = declaratorPath.parentPath;
-            const firstReferencePath = binding.referencePaths[0];
+            const referencePaths = binding.referencePaths.filter(
+              refPath => refPath.node !== binding.identifier,
+            );
+            const firstReferencePath = referencePaths[0];
             const firstReferencePathParentStatement = firstReferencePath.find(
               path =>
                 types.isStatement(path) &&
                 types.isNodesEquivalent(path.scope.path.node, scope.path.node),
             );
-            //eslint-disable-next-line
+            // eslint-disable-next-line
             state.firstReferencePathParentStatement = firstReferencePathParentStatement;
             //eslint-disable-next-line
             state.replacement = types.clone(declarationPath.node);
@@ -141,6 +166,16 @@ export default class ExtractVariablesOperation {
           const referencePaths = binding.referencePaths.map(path => Position.fromNode(path.node));
           this.cursorPositions = [Position.fromNode(binding.path.node.id), ...referencePaths];
           programPath.stop();
+        } else if (
+          types.isObjectPattern(declaratorPath.node.id) &&
+          declaratorPath.node.id.properties
+            .map(property => property.value.name)
+            .includes(this.variableIdentifier.name)
+        ) {
+          const { scope } = declaratorPath;
+          const binding = scope.bindings[this.variableIdentifier.name];
+          const referencePaths = binding.referencePaths.map(path => Position.fromNode(path.node));
+          this.cursorPositions = [...referencePaths];
         }
       },
     });
