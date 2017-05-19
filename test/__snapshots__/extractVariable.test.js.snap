@@ -125,40 +125,6 @@ a + _ref;",
 }
 `;
 
-exports[`extractVariable with correct selection returns correct code 1`] = `
-Object {
-  "code": "let _ref = 5;
-_ref + 2",
-  "cursorPositions": Array [
-    Position {
-      "end": 8,
-      "start": 4,
-    },
-    Position {
-      "end": 18,
-      "start": 14,
-    },
-  ],
-}
-`;
-
-exports[`extractVariable with correct selection returns correct code 2`] = `
-Object {
-  "code": "let _ref = 2;
-5 + _ref",
-  "cursorPositions": Array [
-    Position {
-      "end": 8,
-      "start": 4,
-    },
-    Position {
-      "end": 22,
-      "start": 18,
-    },
-  ],
-}
-`;
-
 exports[`extractVariable with correct selection returns correct code 2 1`] = `
 Object {
   "code": "let _ref = () => {
@@ -174,79 +140,6 @@ _ref",
     Position {
       "end": 35,
       "start": 31,
-    },
-  ],
-}
-`;
-
-exports[`extractVariable with correct selection returns correct code 3`] = `
-Object {
-  "code": "let _ref = 5 + 2;
-_ref",
-  "cursorPositions": Array [
-    Position {
-      "end": 8,
-      "start": 4,
-    },
-    Position {
-      "end": 22,
-      "start": 18,
-    },
-  ],
-}
-`;
-
-exports[`extractVariable with correct selection returns correct code 4`] = `
-Object {
-  "code": "() => {
-  let _ref = 5;
-  _ref + 2
-}",
-  "cursorPositions": Array [
-    Position {
-      "end": 18,
-      "start": 14,
-    },
-    Position {
-      "end": 30,
-      "start": 26,
-    },
-  ],
-}
-`;
-
-exports[`extractVariable with correct selection returns correct code 5`] = `
-Object {
-  "code": "let a = do {
-  let _ref = 5;
-  _ref + 2
-}",
-  "cursorPositions": Array [
-    Position {
-      "end": 23,
-      "start": 19,
-    },
-    Position {
-      "end": 35,
-      "start": 31,
-    },
-  ],
-}
-`;
-
-exports[`extractVariable with correct selection returns correct code 6`] = `
-Object {
-  "code": "import a from \\"b\\";
-let _ref = 5;
-_ref;",
-  "cursorPositions": Array [
-    Position {
-      "end": 27,
-      "start": 23,
-    },
-    Position {
-      "end": 37,
-      "start": 33,
     },
   ],
 }

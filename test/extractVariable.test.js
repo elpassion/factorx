@@ -1,7 +1,18 @@
 // @flow
+import testAllAssumptions from './helpers/testAllAssumptions';
 import ExpressionNotFoundError from '../src/ExpressionNotFoundError';
 import AstExplorer from '../src/AstExplorer';
 import Position from '../src/Position';
+
+testAllAssumptions('extractVariable', ({ code, selections }) => {
+  const astExplorer = new AstExplorer(code);
+  const positions = selections.map(({ start, end }) => new Position(start, end));
+  const result = astExplorer.extractVariable(positions, { type: 'const' });
+  return {
+    code: result.code,
+    selections: result.cursorPositions.map(({ start, end }) => ({ start, end })),
+  };
+});
 
 describe('extractVariable', () => {
   const expectExtractVariable = (code, start, end) => {
@@ -17,15 +28,6 @@ describe('extractVariable', () => {
   };
 
   describe('with correct selection', () => {
-    test('returns correct code', () => {
-      expectExtractVariable('5 + 2', 0, 1);
-      expectExtractVariable('5 + 2', 4, 5);
-      expectExtractVariable('5 + 2', 0, 5);
-      expectExtractVariable('() => {\n  5 + 2\n}', 10, 11);
-      expectExtractVariable('let a = do { 5 + 2 }', 13, 14);
-      expectExtractVariable('import a from "b";\n5;', 19, 20);
-    });
-
     test('returns correct code 2', () => {
       expectExtractVariable('() => {\n  5 + 2\n}', 0, 17);
     });
