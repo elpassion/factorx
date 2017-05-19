@@ -2,7 +2,7 @@
 import recast from 'recast';
 import traverse from 'babel-traverse';
 import * as types from 'babel-types';
-import isEqual from 'lodash/isEqual';
+import { sortBy, isEqual } from 'lodash';
 import Position from '../Position';
 import ExpressionNotFoundError from '../ExpressionNotFoundError';
 import options from './options';
@@ -131,9 +131,27 @@ export default class ExtractVariablesOperation {
             const { scope } = declaratorPath;
             const binding = scope.bindings[this.variableIdentifier.name];
             const declarationPath = declaratorPath.parentPath;
-            const referencePaths = binding.referencePaths.filter(
-              refPath => refPath.node !== binding.identifier,
+            let referencePaths = [];
+            scope.path.traverse({
+              AssignmentExpression: (assignmentPath) => {
+                if (assignmentPath.node.left.name === this.variableIdentifier.name) {
+                  assignmentPath.traverse({
+                    Identifier: (identifierPath) => {
+                      if (
+                        identifierPath.key === 'left' &&
+                        identifierPath.parentPath === assignmentPath
+                      ) {
+                        referencePaths.push(identifierPath);
+                      }
+                    },
+                  });
+                }
+              },
+            });
+            referencePaths = referencePaths.concat(
+              binding.referencePaths.filter(refPath => refPath.node !== binding.identifier),
             );
+            referencePaths = sortBy(referencePaths, [path => path.node.start]);
             const firstReferencePath = referencePaths[0];
             const firstReferencePathParentStatement = firstReferencePath.find(
               path =>
@@ -204,8 +222,27 @@ export default class ExtractVariablesOperation {
         ) {
           const { scope } = declaratorPath;
           const binding = scope.bindings[this.variableIdentifier.name];
-          const referencePaths = binding.referencePaths.map(path => Position.fromNode(path.node));
-          this.cursorPositions = [...referencePaths];
+          let referencePaths = [];
+          scope.path.traverse({
+            AssignmentExpression: (assignmentPath) => {
+              if (assignmentPath.node.left.name === this.variableIdentifier.name) {
+                assignmentPath.traverse({
+                  Identifier: (identifierPath) => {
+                    if (
+                      identifierPath.key === 'left' &&
+                      identifierPath.parentPath === assignmentPath
+                    ) {
+                      referencePaths.push(identifierPath);
+                    }
+                  },
+                });
+              }
+            },
+          });
+          referencePaths = referencePaths.concat(binding.referencePaths);
+          referencePaths = sortBy(referencePaths, [path => path.node.start]);
+          const referencePositions = referencePaths.map(path => Position.fromNode(path.node));
+          this.cursorPositions = [...referencePositions];
         }
       },
     });
