@@ -94,7 +94,7 @@ export default class ExtractVariablesOperation {
   extractVariable = (programPath: Object) => {
     // eslint-disable-next-line no-confusing-arrow
     const getPathScope = path =>
-      types.isArrowFunctionExpression(path) ? path.scope.parent : path.scope;
+      (types.isArrowFunctionExpression(path) ? path.scope.parent : path.scope);
 
     const firstSelection = this.selections[0];
 
@@ -154,6 +154,36 @@ export default class ExtractVariablesOperation {
     traversalState.firstReferencePathParentStatement.insertBefore(traversalState.replacement);
   };
 
+  mergeDeclarations = (programPath: Object) => {
+    programPath.traverse({
+      VariableDeclarator: (declaratorPath) => {
+        if (
+          isEqual(this.findScopeRoad(declaratorPath.scope), this.scopeRoad) &&
+          (types.isObjectPattern(declaratorPath.node.id) &&
+            declaratorPath.node.id.properties
+              .map(property => property.value.name)
+              .includes(this.variableIdentifier.name))
+        ) {
+          const { scope } = declaratorPath;
+          const binding = scope.bindings[this.variableIdentifier.name];
+          const bindingsWithSameInit = Object.values(scope.bindings).filter((nextBinding: any) =>
+            types.isNodesEquivalent(binding.path.node.init, nextBinding.path.node.init),
+          );
+          const highestBinding = (bindingsWithSameInit[0]: any);
+          const clonedProperty = types.clone(binding.path.node.id.properties[0]);
+          if (binding !== highestBinding) {
+            binding.path.remove();
+            highestBinding.path.traverse({
+              ObjectPattern: (opPath) => {
+                opPath.pushContainer('properties', clonedProperty);
+              },
+            });
+          }
+        }
+      },
+    });
+  };
+
   setCursorPosition = (programPath: Object) => {
     programPath.traverse({
       VariableDeclarator: (declaratorPath) => {
@@ -184,6 +214,7 @@ export default class ExtractVariablesOperation {
   start(): { ast: Object, result: { code: string, cursorPositions: Array<Position> } } {
     this.transform(this.extractVariable);
     this.transform(this.moveDeclaration);
+    this.transform(this.mergeDeclarations);
     this.transform(this.setCursorPosition);
 
     return { ast: this.ast, result: { code: this.code, cursorPositions: this.cursorPositions } };
