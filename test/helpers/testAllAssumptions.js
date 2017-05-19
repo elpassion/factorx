@@ -5,27 +5,34 @@ import fs from 'fs';
 import glob from 'glob';
 
 const parseCode = (code: string) => {
-  const findStartMarker = (codeString: string) => codeString.indexOf('/* CS */');
-  const findEndMarker = (codeString: string) => codeString.indexOf('/* CE */');
-  const removeStartMarker = (codeString: string) =>
-    codeString
-      .slice(0, findStartMarker(codeString))
-      .concat(codeString.slice(findStartMarker(codeString) + 8));
-  const removeEndMarker = (codeString: string) =>
-    codeString
-      .slice(0, findEndMarker(codeString))
-      .concat(codeString.slice(findEndMarker(codeString) + 8));
+  const findMarker = (codeString: string) => {
+    const match = (codeString.match(/\/\* C[SE]\d* \*\//g): any);
+    const index = codeString.indexOf(match[0]);
+    const length = match[0].length;
+    const cursorIndex = match[0].match(/\d+/) ? parseInt(match[0].match(/\d+/)[0], 10) : null;
+    return { index, length, cursorIndex };
+  };
+  const removeMarker = (codeString: string, marker) =>
+    codeString.slice(0, marker.index).concat(codeString.slice(marker.index + marker.length));
 
   const findCursors = (codeString: string) => {
     let newCode = codeString.slice(0);
     newCode = newCode.replace(/\/\* C \*\//g, '/* CS *//* CE */');
     const selections = [];
-    while (newCode.includes('/* CS */') || newCode.includes('/* CE */')) {
-      const start = findStartMarker(newCode);
-      newCode = removeStartMarker(newCode);
-      const end = findEndMarker(newCode);
-      newCode = removeEndMarker(newCode);
-      selections.push({ start, end });
+    while (newCode.match(/\/\* C[SE]\d* \*\//g)) {
+      const start = findMarker(newCode);
+      newCode = removeMarker(newCode, start);
+      const end = findMarker(newCode);
+      newCode = removeMarker(newCode, end);
+      const selection = {
+        start: start.index,
+        end: end.index,
+      };
+      if (start.cursorIndex !== null) {
+        selections[start.cursorIndex] = selection;
+      } else {
+        selections.push(selection);
+      }
     }
     return {
       code: newCode,
@@ -91,10 +98,22 @@ describe('#parseCode', () => {
       selections: [{ start: 4, end: 4 }],
     });
   });
+  test('correctly parses code with numbered cursor', () => {
+    expect(parseCode('5 + /* CS0 */5/* CE0 */;')).toEqual({
+      code: '5 + 5;',
+      selections: [{ start: 4, end: 5 }],
+    });
+  });
   test('correctly parses code with multiple cursors', () => {
     expect(parseCode('/* CS */5/* CE */ + /* CS */5/* CE */;')).toEqual({
       code: '5 + 5;',
       selections: [{ start: 0, end: 1 }, { start: 4, end: 5 }],
+    });
+  });
+  test('correctly parses code with multiple numbered cursors', () => {
+    expect(parseCode('/* CS1 */5/* CE1 */ + /* CS0 */5/* CE0 */;')).toEqual({
+      code: '5 + 5;',
+      selections: [{ start: 4, end: 5 }, { start: 0, end: 1 }],
     });
   });
   test('correctly parses empty cursor marker', () => {
