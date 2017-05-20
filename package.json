@@ -1,7 +1,7 @@
 {
   "name": "factorx",
   "main": "./lib/main.js",
-  "version": "0.2.0",
+  "version": "0.2.3",
   "description": "Refactoring tool based on ast.",
   "keywords": [
     "refactoring",
