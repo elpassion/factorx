@@ -2,4 +2,5 @@
 **/flow-libs/**
 **/flow-typed/**
 **/bin/**
+**/lib/**
 **/*.compare.js

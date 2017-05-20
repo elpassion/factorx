@@ -13,7 +13,7 @@ fs.unlink('/tmp/factorX.sock', () => {
       if (fn) {
         response = JSON.stringify(fn(parsedData.file, parsedData.args.slice(3)));
       } else {
-        response = 'Function not found.';
+        response = JSON.stringify({ status: 'error', error: { name: 'Function not found.' } });
       }
       socket.write(response);
     });

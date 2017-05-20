@@ -1,14 +1,21 @@
 {
   "name": "factorx",
-  "version": "0.1.10",
-  "description": "Refactoring tool based on ast.",
   "main": "./lib/main.js",
+  "version": "0.2.3",
+  "description": "Refactoring tool based on ast.",
+  "keywords": [
+    "refactoring",
+    "factorx",
+    "javascript",
+    "atom",
+    "vscode"
+  ],
   "repository": "https://github.com/michalwarda/factorx.git",
   "author": "Michał Warda",
   "license": "MIT",
   "scripts": {
     "flow": "flow",
-    "build": "babel src -d lib && cp -r ./Client/index.js ./bin/factorx.js",
+    "build": "babel src -d lib",
     "test": "jest",
     "watch": "jest --watch",
     "flow-typed": "flow-typed install",
@@ -43,6 +50,7 @@
     "eslint-plugin-promise": "^3.4.0",
     "flow-bin": "^0.43.1",
     "flow-typed": "^2.0.0",
+    "glob": "^7.1.1",
     "jest": "^19.0.2",
     "pre-commit": "^1.2.2"
   },

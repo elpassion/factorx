@@ -11,21 +11,19 @@ const spawnServer = (file) => {
   const spawn = require('child_process').spawn;
   // eslint-disable-next-line global-require
   const path = require('path');
-  // eslint-disable-next-line global-require
-  // const fs = require('fs');
-  // const out = fs.openSync(path.join(__dirname, '..', 'Server', 'out.log'), 'a');
-  // const err = fs.openSync(path.join(__dirname, '..', 'Server', 'err.log'), 'a');
-  const child = spawn('node', [path.join(__dirname, '..', 'Server')], {
+  const child = spawn('node', [path.join(__dirname, 'server')], {
     detached: true,
-    stdio: 'ignore', //['ignore', out, err],
+    stdio: 'ignore',
   });
 
   child.unref();
   connecting = setTimeout(() => {
     if (connectionTries <= 5) {
+      // eslint-disable-next-line no-use-before-define
       connect(file);
     } else {
       clearInterval(connecting);
+      process.stdout.write({ status: 'error', error: { name: 'Unable to spawn factorX server' } });
     }
   }, 300);
 };
