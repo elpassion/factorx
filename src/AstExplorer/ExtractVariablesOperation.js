@@ -252,18 +252,20 @@ export default class ExtractVariablesOperation {
     this.transform(this.extractVariable);
     this.transform(this.moveDeclaration);
     this.transform(this.mergeDeclarations);
-    this.transform(this.setCursorPosition);
+    this.transform(this.setCursorPosition, { recast: false });
 
     return { ast: this.ast, result: { code: this.code, cursorPositions: this.cursorPositions } };
   }
 
-  transform(transformation: Function) {
+  transform(transformation: Function, transformOptions: { recast: boolean } = { recast: true }) {
     traverse(this.ast, {
       Program(programPath) {
         transformation(programPath);
       },
     });
-    this.code = recast.print(this.ast).code;
-    this.ast = recast.parse(this.code, options);
+    if (transformOptions.recast) {
+      this.code = recast.print(this.ast).code;
+      this.ast = recast.parse(this.code, options);
+    }
   }
 }
