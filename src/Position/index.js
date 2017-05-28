@@ -1,4 +1,5 @@
 // @flow
+import * as types from 'babel-types';
 
 export default class Position {
   start: number;
@@ -10,6 +11,16 @@ export default class Position {
   }
 
   static fromNode(node: Object) {
+    return new Position(node.start, node.end);
+  }
+
+  static fromBinding(binding: Object) {
+    let node = binding.path.node.id;
+    if (types.isObjectPattern(node)) {
+      node = binding.path.node.id.properties.find(
+        property => property.key.name === binding.identifier.name,
+      );
+    }
     return new Position(node.start, node.end);
   }
 

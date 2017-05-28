@@ -7,6 +7,5 @@ const {
   e,
   /* CS */c/* CE */
 } = a.b;
-
 /* CS */c/* CE */
 /* CS */c/* CE */.d
