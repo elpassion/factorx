@@ -11,8 +11,8 @@ import { referencePathsForVariableInScope, findScopeRoad } from './helpers';
 export default class ExtractVariablesOperation {
   ast: Object;
   code: string;
-  replacedNodesCount: number;
-  scopeRoad: Array<any>;
+  replacedNodesCount: number = 0;
+  scopeRoad: Array<any> = [];
   variableType: 'const' | 'let';
   variableIdentifier: Object;
   variableBinding: Object;
@@ -22,8 +22,6 @@ export default class ExtractVariablesOperation {
 
   constructor(ast: Object, variableType: 'const' | 'let' = 'let', selections: Array<Position>) {
     this.ast = ast;
-    this.replacedNodesCount = 0;
-    this.scopeRoad = [];
     this.variableType = variableType;
     this.selections = selections;
   }
